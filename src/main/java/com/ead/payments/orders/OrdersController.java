@@ -1,6 +1,5 @@
 package com.ead.payments.orders;
 
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,10 +21,5 @@ public class OrdersController {
         return new OrderPlacedResponse(orderPlaced.id());
     }
 
-    public record OrderPlacedResponse(Integer orderId) {
-    }
-
-    public record PlaceOrderRequest(Integer id, Set<LineItem> lineItems) {
-    }
 }
 
