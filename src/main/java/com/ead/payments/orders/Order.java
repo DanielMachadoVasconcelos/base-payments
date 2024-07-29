@@ -1,9 +1,20 @@
 package com.ead.payments.orders;
 
-import java.util.Set;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
+import com.google.common.base.Preconditions;
+import java.util.Optional;
+import java.util.UUID;
 
-@Table("orders")
-record Order(@Id Integer id, Set<LineItem> lineItems) {
+public record Order(
+        UUID id,
+        Long version,
+        String currency,
+        Long amount
+) {
+
+        public Order(UUID id, Long version, String currency, Long amount) {
+            this.id = Preconditions.checkNotNull(Optional.ofNullable(id).orElseGet(UUID::randomUUID), "The id is required");
+            this.version = Preconditions.checkNotNull(version, "The version is required");
+            this.currency = Preconditions.checkNotNull(currency, "The currency is required");
+            this.amount = Preconditions.checkNotNull(amount, "The amount is required");
+        }
 }

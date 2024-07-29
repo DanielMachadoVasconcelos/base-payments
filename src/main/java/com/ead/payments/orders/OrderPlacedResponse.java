@@ -1,4 +1,6 @@
 package com.ead.payments.orders;
 
-public record OrderPlacedResponse(Integer orderId) {
+import java.util.UUID;
+
+public record OrderPlacedResponse(UUID orderId) {
 }

@@ -14,7 +14,7 @@ class InventoryService {
 
     @ApplicationModuleListener
     void on (OrderPlacedEvent event) throws InterruptedException {
-        log.info("Order placed: {}", event.orderId());
+        log.info("OrderEntity placed: {}", event.orderId());
         Thread.sleep(Duration.ofSeconds(5)); // Simulate inventory update
         log.info("Inventory updated: {}", event.orderId());
     }

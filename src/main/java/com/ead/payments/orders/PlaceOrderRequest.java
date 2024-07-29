@@ -1,6 +1,11 @@
 package com.ead.payments.orders;
 
-import java.util.Set;
+import java.util.UUID;
 
-public record PlaceOrderRequest(Integer id, Set<LineItem> lineItems) {
+public record PlaceOrderRequest(
+        UUID id,
+        Long version,
+        String currency,
+        Long amount
+) {
 }
