@@ -1,19 +1,17 @@
 package com.ead.payments.orders;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Map;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
-@ResponseBody
 @RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrdersController {
@@ -22,11 +20,11 @@ public class OrdersController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public OrderPlacedResponse placeOrder(@RequestBody PlaceOrderRequest request) throws JsonProcessingException {
+    @RolesAllowed({"ROLE_MERCHANT", "ROLE_CUSTOMER"})
+    public OrderPlacedResponse placeOrder(@RequestBody PlaceOrderRequest request)  {
         Order order = new Order(request.id(), request.version(), request.currency(), request.amount());
         var orderPlaced = ordersService.placeOrder(order);
-        return new OrderPlacedResponse(orderPlaced.id());
+        return new OrderPlacedResponse(orderPlaced.id(), orderPlaced.version(), orderPlaced.currency(), orderPlaced.amount());
     }
-
 }
 

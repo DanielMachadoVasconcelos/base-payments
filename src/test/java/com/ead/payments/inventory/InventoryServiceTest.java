@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.ead.payments.orders.OrderPlacedEvent;
 import java.time.Duration;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.modulith.test.ApplicationModuleTest;
@@ -17,7 +18,8 @@ class InventoryServiceTest {
     void shouldReduceTheProductStockWhenAOrderIsPlaced(Scenario scenario) {
 
         // Given
-        OrderPlacedEvent orderPlacedEvent = new OrderPlacedEvent(1);
+        var expectedOrderId = UUID.randomUUID();
+        var orderPlacedEvent = new OrderPlacedEvent(expectedOrderId);
 
         // When
         var result = scenario.publish(orderPlacedEvent);

@@ -1,29 +1,35 @@
 package com.ead.payments.orders;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
-import java.time.Instant;
 import java.util.Date;
 import jakarta.persistence.Id;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.With;
 import lombok.experimental.Accessors;
+import org.hibernate.envers.Audited;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+@With
 @Data
-@Entity
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Accessors(fluent = true)
+@Entity(name = "orders")
 @Table(name = "orders", schema = "orders")
+@EntityListeners(AuditingEntityListener.class)
 public class OrderEntity {
 
     @Id
@@ -36,10 +42,11 @@ public class OrderEntity {
 
     @Lob
     @Column(name = "payload")
-    private byte[] payload;
+    @Convert(converter = OrderPayloadConverter.class)
+    private OrderPayload payload;
 
     @CreatedDate
-    @Column(nullable = false, name = "created_at", updatable = false, columnDefinition = "TIMESTAMPTZ DEFAULT NOW()")
+    @Column(name = "created_at")
     private Date createdAt;
 
     @LastModifiedDate
