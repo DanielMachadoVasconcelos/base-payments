@@ -1,5 +1,8 @@
 package com.ead.payments.orders;
 
+import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
@@ -12,8 +15,8 @@ public interface OrderEntityMapper {
 
     default OrderEntity from(Order source){
         return new OrderEntity(
-                source.id(),
-                source.version(),
+                Optional.ofNullable(source.id()).orElseGet(UUID::randomUUID),
+                Optional.ofNullable(source.version()).orElse(1L),
                 new OrderPayload(source.currency(), source.amount()),
                 null,
                 null,
