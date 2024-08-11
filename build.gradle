@@ -1,5 +1,8 @@
 plugins {
 	id 'java'
+	id 'idea'
+	id 'jacoco'
+
 	id 'org.springframework.boot' version '3.3.2'
 	id 'io.spring.dependency-management' version '1.1.6'
 }
@@ -33,10 +36,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.data:spring-data-envers'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
 	implementation 'org.springframework.modulith:spring-modulith-events-api'
 	implementation 'org.springframework.modulith:spring-modulith-starter-core'
 	implementation 'org.springframework.modulith:spring-modulith-starter-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.flywaydb:flyway-database-postgresql'
@@ -74,6 +79,30 @@ dependencyManagement {
 	}
 }
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
+	testLogging {
+		events "skipped", "failed"
+	}
+
+	systemProperty("junit.jupiter.conditions.deactivate", "*")
+	systemProperty("junit.jupiter.extensions.autodetection.enabled", true)
+	systemProperty("junit.jupiter.testinstance.lifecycle.default", "per_class")
+	systemProperty("junit.jupiter.execution.parallel.enabled", true)
+	systemProperty("junit.jupiter.execution.parallel.mode.default", "concurrent")
+	finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		html.required = true
+		xml.required = true
+		csv.required = true
+	}
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: '**/generated/**')
+		}))
+	}
 }

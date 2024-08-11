@@ -5,6 +5,7 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Lob;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.util.Date;
@@ -15,7 +16,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
 import lombok.experimental.Accessors;
-import org.hibernate.envers.Audited;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -46,7 +46,7 @@ public class OrderEntity {
     private OrderPayload payload;
 
     @CreatedDate
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private Date createdAt;
 
     @LastModifiedDate
@@ -60,4 +60,11 @@ public class OrderEntity {
     @LastModifiedBy
     @Column(name = "modified_by")
     private String modifiedBy;
+
+    @PrePersist
+    public void ensureId(){
+        if (id == null) {
+            id = UUID.randomUUID();
+        }
+    }
 }

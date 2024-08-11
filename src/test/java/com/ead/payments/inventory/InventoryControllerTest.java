@@ -11,7 +11,7 @@ import org.springframework.modulith.test.ApplicationModuleTest;
 import org.springframework.modulith.test.Scenario;
 
 @ApplicationModuleTest
-class InventoryServiceTest {
+class InventoryControllerTest {
 
     @Test
     @DisplayName("Should reduce the product stock when a order is placed")
