@@ -1,5 +1,7 @@
 package com.ead.payments.orders;
 
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,9 +19,13 @@ public class OrdersService {
     private final OrderEntityMapper orderEntityMapper;
 
     public Order placeOrder(Order order)  {
-        log.info("Placing the Order: {}", order);
         OrderEntity entity = ordersRepository.save(orderEntityMapper.from(order));
         applicationEventPublisher.publishEvent(new OrderPlacedEvent(entity.id()));
         return orderEntityMapper.from(entity);
+    }
+
+    public Optional<Order> findById(UUID orderId) {
+        return ordersRepository.findById(orderId)
+                .map(orderEntityMapper::from);
     }
 }

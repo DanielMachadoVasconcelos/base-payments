@@ -2,7 +2,6 @@ package com.ead.payments.orders;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_CLASS;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -16,11 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
-@Sql(scripts = "/test-data/delete-all-orders.sql", executionPhase = AFTER_TEST_CLASS)
-class OrdersControllerTest extends SpringBootIntegrationTest {
+class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -114,7 +111,7 @@ class OrdersControllerTest extends SpringBootIntegrationTest {
         response.andDo(print())
                 .andExpect(status().is4xxClientError())
                 .andExpectAll(
-                        jsonPath("$.details").value(is("The 'PlaceOrderRequest' is invalid")),
+                        jsonPath("$.detail").value(is("The 'PlaceOrderRequest' is invalid")),
                         jsonPath("$.invalid_params.currency").value(is("must not be blank")),
                         jsonPath("$.title").value(is("Constraint Violation Exception"))
                 );
@@ -144,7 +141,7 @@ class OrdersControllerTest extends SpringBootIntegrationTest {
         response.andDo(print())
                 .andExpect(status().is4xxClientError())
                 .andExpectAll(
-                        jsonPath("$.details").value(is("The 'PlaceOrderRequest' is invalid")),
+                        jsonPath("$.detail").value(is("The 'PlaceOrderRequest' is invalid")),
                         jsonPath("$.invalid_params.amount").value(is("must not be null")),
                         jsonPath("$.title").value(is("Constraint Violation Exception"))
                 );

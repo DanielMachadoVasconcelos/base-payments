@@ -10,6 +10,7 @@ import java.util.stream.StreamSupport;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 class GeneralExceptionHandler {
 
 	@ExceptionHandler(ConstraintViolationException.class)
-	public ResponseEntity<Map<String, Object>> handleConstraintViolation(ConstraintViolationException exception) {
+	public ResponseEntity<ProblemDetail> handleConstraintViolation(ConstraintViolationException exception) {
 		var invalidParams = exception.getConstraintViolations()
 				.stream()
 				.map(violation -> {
@@ -35,18 +36,19 @@ class GeneralExceptionHandler {
 							      "reason", violation.getMessage());
 
 				})
-				.collect(toList());
+				.toList();
 
-		return ResponseEntity.unprocessableEntity()
-		 					.body(Map.of(
-							"title", "Constraint violated exception",
-							"details", exception.getMessage(),
-							"invalid_params", invalidParams));
+		ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
+		problemDetail.setTitle("Constraint violated exception");
+		problemDetail.setDetail(exception.getMessage());
+		problemDetail.setProperty("invalid_params", invalidParams);
+
+		return ResponseEntity.unprocessableEntity().body(problemDetail);
 	}
 
 	@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<Map<String, Object>> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+	public ResponseEntity<ProblemDetail>  handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
 
 		var invalidParams = exception.getBindingResult()
 													   .getFieldErrors()
@@ -60,11 +62,13 @@ class GeneralExceptionHandler {
 				.map(Class::getSimpleName)
 				.orElse("request");
 
-		var details = "The '" + invalidClassName + "' is invalid";;
-		return ResponseEntity.unprocessableEntity()
-							 .body(Map.of(
-									"title", "Constraint Violation Exception",
-									"details", details,
-									"invalid_params", invalidParams));
+		var details = STR."The '\{invalidClassName}' is invalid";
+
+		ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
+		problemDetail.setTitle("Constraint Violation Exception");
+		problemDetail.setDetail(details);
+		problemDetail.setProperty("invalid_params", invalidParams);
+
+		return ResponseEntity.unprocessableEntity().body(problemDetail);
 	}
 }

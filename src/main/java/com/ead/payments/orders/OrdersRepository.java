@@ -8,4 +8,5 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 interface OrdersRepository extends ListPagingAndSortingRepository<OrderEntity, UUID>,
         ListCrudRepository<OrderEntity, UUID> {
+
 }
