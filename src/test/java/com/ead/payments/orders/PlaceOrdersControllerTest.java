@@ -2,6 +2,8 @@ package com.ead.payments.orders;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -147,4 +149,59 @@ class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
                 );
     }
 
+    @Test
+    @WithMockUser(username = "merchant", roles = {"MERCHANT"})
+    @DisplayName("Should allow to update order amount when value is grater then zero")
+    void shouldAllowToUpdateOrderAmountWhenValueIsGraterThenZero() throws Exception {
+
+        // Setup: An order request with no line items
+        var placeOrderRequest = new PlaceOrderRequest(
+                UUID.randomUUID(),
+                1L,
+                "USD",
+                2000L
+        );
+
+        // And:  the order is placed successfully
+       mockMvc.perform(post("/orders")
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("utf-8")
+                .content(objectMapper.writeValueAsString(placeOrderRequest))
+        )
+               .andExpect(status().isCreated());
+
+        // Given: An order request with no line items
+        var updateOrderRequest = new UpdateOrderRequest(
+                1L,
+                100L
+        );
+
+        // When: placing an order
+        var response = mockMvc.perform(patch("/orders/%s".formatted(placeOrderRequest.id()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("utf-8")
+                .content(objectMapper.writeValueAsString(updateOrderRequest))
+        );
+
+        // Then: the order should be updated successfully
+        response.andDo(print())
+                .andExpect(status().is2xxSuccessful())
+                .andExpectAll(
+                        jsonPath("$.id").value(is(placeOrderRequest.id().toString())),
+                        jsonPath("$.amount").value(is(100)),
+                        jsonPath("$.version").value(is(1))
+                );
+
+        // And: the order should have the new version and amount
+        mockMvc.perform(get("/orders/%s".formatted(placeOrderRequest.id()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("utf-8")
+                .content(objectMapper.writeValueAsString(placeOrderRequest))
+        )
+                .andExpect(status().is2xxSuccessful())
+                .andExpectAll(
+                        jsonPath("$.amount").value(is(100)),
+                        jsonPath("$.version").value(is(2))
+                );
+    }
 }
