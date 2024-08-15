@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.ead.payments.SpringBootIntegrationTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,8 @@ class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
                 UUID.randomUUID(),
                 1L,
                 "USD",
-                100L
+                100L,
+                Set.of()
         );
 
         // When placing an order
@@ -68,7 +70,8 @@ class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
                 null,
                 1L,
                 "USD",
-                100L
+                100L,
+                Set.of()
         );
 
         // When placing an order
@@ -99,7 +102,8 @@ class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
                 UUID.randomUUID(),
                 1L,
                 null,
-                100L
+                100L,
+                Set.of()
         );
 
         // When placing an order
@@ -129,7 +133,8 @@ class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
                 UUID.randomUUID(),
                 1L,
                 "USD",
-                null
+                null,
+                Set.of()
         );
 
         // When placing an order
@@ -159,7 +164,8 @@ class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
                 UUID.randomUUID(),
                 1L,
                 "USD",
-                2000L
+                2000L,
+                Set.of()
         );
 
         // And:  the order is placed successfully

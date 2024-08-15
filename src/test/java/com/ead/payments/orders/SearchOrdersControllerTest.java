@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.ead.payments.SpringBootIntegrationTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ public class SearchOrdersControllerTest extends SpringBootIntegrationTest {
 
         // Given an order id
        var expectedOrderId = UUID.randomUUID();
-       var request = new PlaceOrderRequest(expectedOrderId, 1L, "USD", 100L);
+       var request = new PlaceOrderRequest(expectedOrderId, 1L, "USD", 100L, Set.of());
 
         // and: the order is created successfully
         mockMvc.perform(post("/orders")

@@ -14,7 +14,7 @@ public interface OrderEntityMapper {
         return new OrderEntity(
                 source.id(),
                 source.version(),
-                new OrderPayload(source.currency(), source.amount()),
+                new OrderPayload(source.currency(), source.amount(), source.lineItems()),
                 null,
                 null,
                 null,
@@ -27,7 +27,8 @@ public interface OrderEntityMapper {
                 source.id(),
                 source.version(),
                 source.payload().currency(),
-                source.payload().amount()
+                source.payload().amount(),
+                source.payload().lineItems()
         );
    }
 }

@@ -2,17 +2,20 @@ package com.ead.payments.orders;
 
 import com.google.common.base.Preconditions;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public record Order(
         UUID id,
         Long version,
         String currency,
-        Long amount
+        Long amount,
+        Set<LineItem> lineItems
 ) {
 
     public Order {
         Preconditions.checkNotNull(Optional.ofNullable(id).orElseGet(UUID::randomUUID), "The id is required");
+        Preconditions.checkNotNull(Optional.ofNullable(lineItems).orElse(Set.of()), "The line items are required");
 
         Preconditions.checkNotNull(version, "The version is required");
         Preconditions.checkArgument(version > 0, "The version must be greater than 0");

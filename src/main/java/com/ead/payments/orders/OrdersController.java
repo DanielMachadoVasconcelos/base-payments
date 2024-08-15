@@ -31,12 +31,22 @@ public class OrdersController {
     @ResponseStatus(HttpStatus.CREATED)
     @RolesAllowed({"ROLE_MERCHANT", "ROLE_CUSTOMER"})
     public OrderPlacedResponse placeOrder(@RequestBody @Valid PlaceOrderRequest request) {
-        Order order = new Order(request.id(), request.version(), request.currency(), request.amount());
+
+        Order order = new Order(
+                request.id(),
+                request.version(),
+                request.currency(),
+                request.amount(),
+                request.lineItems()
+        );
+
         var orderPlaced = ordersService.placeOrder(order);
         return new OrderPlacedResponse(orderPlaced.id(),
                 orderPlaced.version(),
                 orderPlaced.currency(),
-                orderPlaced.amount());
+                orderPlaced.amount(),
+                orderPlaced.lineItems()
+        );
     }
 
     @GetMapping("/{orderId}")
