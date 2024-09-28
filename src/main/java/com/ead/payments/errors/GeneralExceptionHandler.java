@@ -1,7 +1,5 @@
 package com.ead.payments.errors;
 
-import static java.util.stream.Collectors.toList;
-
 import jakarta.validation.ConstraintViolationException;
 import java.util.Map;
 import java.util.Optional;

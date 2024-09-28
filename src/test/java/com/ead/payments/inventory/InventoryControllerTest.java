@@ -19,7 +19,11 @@ class InventoryControllerTest {
 
         // Given
         var expectedOrderId = UUID.randomUUID();
-        var orderPlacedEvent = new OrderPlacedEvent(expectedOrderId);
+        var orderPlacedEvent = new OrderPlacedEvent(
+                expectedOrderId,
+                "USD",
+                100L
+        );
 
         // When
         var result = scenario.publish(orderPlacedEvent);
@@ -28,7 +32,7 @@ class InventoryControllerTest {
         result.andWaitAtMost(Duration.ofSeconds(5))
                 .forEventOfType(OrderPlacedEvent.class)
                 .toArriveAndVerify(event ->
-                        assertEquals(orderPlacedEvent.orderId(), event.orderId())
+                        assertEquals(orderPlacedEvent.getId(), event.getId())
                 );
     }
 }
