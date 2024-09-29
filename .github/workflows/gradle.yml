@@ -18,37 +18,58 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
+    services:
+      # Ensure docker-compose dependencies are started
+      docker:
+        image: docker:20.10.16
+        options: --privileged
+        ports:
+          - 5432:5432   # PostgreSQL port (if using)
+          - 9092:9092   # Kafka port (if using)
 
-      # Checkout the repository
+      steps:
+
+        # Check docker compose version
+      - name: Check Docker Compose Version
+        run: docker-compose --version
+
+        # Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+        # Set up JDK 21
       - name: Set up JDK 21
         uses: actions/setup-java@v2
         with:
           java-version: '21'
           distribution: 'temurin'
-          java-package: jdk
-          check-latest: true
           cache: gradle
 
-      - name: Spin up docker compose resources
+        # Start Docker Compose services
+      - name: Spin up Docker Compose resources
         run: docker-compose up -d
+        timeout-minutes: 5
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
         with:
-          arguments: build -Djava.compiler.args="--enable-preview"
+          arguments: clean build -Djava.compiler.args="--enable-preview" --info --stacktrace
 
+        # Upload test results to GitHub
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
-          files: |
-            test-results/**/*.xml
-            test-results/**/*.trx
-            test-results/**/*.json
+          files: '**/build/test-results/test/*.xml'  # Make sure Gradle produces JUnit-style XML test reports
 
-      - name: Clean up docker compose resources
+        # Archive Test Reports as Artifacts
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: Test Reports
+          path: '**/build/reports/tests/test'  # Upload HTML test reports
+
+        # Clean up Docker Compose resources
+      - name: Clean up Docker Compose
         run: docker-compose down
