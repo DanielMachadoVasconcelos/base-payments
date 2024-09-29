@@ -1,10 +1,12 @@
 package com.ead.payments.orders;
 
 import com.ead.payments.CommandDispatcher;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Role;
 import org.springframework.http.HttpStatus;
 
 import java.util.UUID;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/v1/orders")
+@RolesAllowed({"ROLE_MERCHANT", "ROLE_CUSTOMER"})
 public class OrderController {
 
     CommandDispatcher commandDispatcher;
