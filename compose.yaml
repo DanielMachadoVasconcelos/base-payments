@@ -7,11 +7,40 @@ services:
       - 'POSTGRES_USER=user'
     ports:
       - '5432:5432'
-  rabbitmq:
-    image: 'rabbitmq:3.12.6-management'
+
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: kafka
     environment:
-      - 'RABBITMQ_DEFAULT_PASS=secret'
-      - 'RABBITMQ_DEFAULT_USER=myuser'
+      - KAFKA_CFG_KRAFT_MODE=controller
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - ALLOW_PLAINTEXT_LISTENER=yes
     ports:
-      - '5672:5672'
-      - '15672:15672'
+      - "9092:9092"
+    volumes:
+      - kafka_data:/bitnami/kafka
+
+  akhq:
+    image: tchiotludo/akhq:latest
+    container_name: akhq
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            kafka-local:
+              properties:
+                bootstrap.servers: "kafka:9092"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka
+
+volumes:
+  kafka_data:

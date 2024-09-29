@@ -4,40 +4,19 @@ CREATE SCHEMA IF NOT EXISTS orders;
 -- Set the search path to the orders schema
 SET search_path TO orders;
 
-CREATE TABLE IF NOT EXISTS orders
-(
-    id               UUID         NOT NULL DEFAULT gen_random_uuid(),
-    version      BIGINT       NOT NULL DEFAULT 1,
-    payload TEXT,
-    CONSTRAINT pk_orders PRIMARY KEY (id)
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Create the event_store table
+CREATE TABLE IF NOT EXISTS event_store (
+    id VARCHAR(255) PRIMARY KEY DEFAULT uuid_generate_v4(),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    aggregated_identifier VARCHAR(255) NOT NULL,
+    aggregate_type VARCHAR(255) NOT NULL,
+    version INT NOT NULL CHECK (version >= 0),
+    event_type VARCHAR(255) NOT NULL,
+    event_data TEXT NOT NULL,
+    UNIQUE (aggregated_identifier, version)
 );
 
-ALTER TABLE orders
-    ADD COLUMN created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    ADD COLUMN modified_at TIMESTAMPTZ,
-    ADD COLUMN created_by  VARCHAR,
-    ADD COLUMN modified_by VARCHAR;
-
-create sequence orders_revision_seq INCREMENT BY 1 START WITH 1;
-
-create table orders_revision
-(
-    rev      BIGINT NOT NULL PRIMARY KEY DEFAULT nextval('orders_revision_seq'),
-    revtstmp BIGINT
-);
-
-ALTER sequence orders_revision_seq OWNED BY orders_revision.rev;
-
-CREATE TABLE orders_aud
-(
-    id   uuid   NOT NULL,
-    rev         BIGINT NOT NULL REFERENCES orders_revision (rev),
-    revtype     smallint,
-    version     bigint,
-    payload   text,
-    created_at  timestamp(6),
-    created_by  varchar(255),
-    modified_at timestamp(6),
-    modified_by varchar(255),
-    PRIMARY KEY (rev, id)
-);
+-- Create an index on the aggregated_identifier column
+CREATE INDEX idx_aggregated_identifier ON event_store (aggregated_identifier);
