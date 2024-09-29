@@ -1,5 +1,6 @@
 # Base Payments Service
 ## Daniel Machado Vasconcelos
+[![Java CI with Gradle](https://github.com/DanielMachadoVasconcelos/base-payments/actions/workflows/gradle.yml/badge.svg)](https://github.com/DanielMachadoVasconcelos/base-payments/actions/workflows/gradle.yml)
 
 ### Overview
 This project aims to demonstrate how Spring Modulith can be used to create a modular, maintainable architecture by ensuring small, self-contained modules without unnecessary package dependencies. The goal is to improve cohesion and reduce coupling, while leveraging event-driven design patterns and architectural best practices.
