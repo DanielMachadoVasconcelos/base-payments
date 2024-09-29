@@ -49,7 +49,7 @@ jobs:
 
       # Start Docker Compose services
       - name: Spin up Docker Compose resources
-        run: docker-compose up -d
+        run: docker compose up -d
         timeout-minutes: 5
 
       # Build and test with Gradle
@@ -75,4 +75,4 @@ jobs:
 
       # Clean up Docker Compose resources
       - name: Clean up Docker Compose
-        run: docker-compose down
+        run: docker compose down
