@@ -33,7 +33,7 @@ jobs:
     steps:
       # Check Docker Compose Version
       - name: Check Docker Compose Version
-        run: docker-compose --version
+        run: docker compose --version
 
       # Checkout the repository
       - name: Checkout Repository
