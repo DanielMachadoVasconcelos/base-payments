@@ -1,6 +1,10 @@
 services:
   postgres:
     image: 'postgres:latest'
+    networks:
+      - integration-test
+    volumes:
+      - "postgres_data:/var/lib/postgresql/data"
     environment:
       - 'POSTGRES_DB=orders'
       - 'POSTGRES_PASSWORD=password'
@@ -24,6 +28,8 @@ services:
   kafka:
     image: bitnami/kafka:latest
     container_name: kafka
+    networks:
+      - integration-test
     environment:
       - KAFKA_CFG_KRAFT_MODE=controller
       - KAFKA_CFG_NODE_ID=1
@@ -43,6 +49,8 @@ services:
   akhq:
     image: tchiotludo/akhq:latest
     container_name: akhq
+    networks:
+      - integration-test
     environment:
       AKHQ_CONFIGURATION: |
         akhq:
@@ -57,3 +65,12 @@ services:
 
 volumes:
   kafka_data:
+    driver: local
+  postgres_data:
+    driver: local
+  pgadmin4_data:
+    driver: local
+
+networks:
+  integration-test:
+    driver: bridge
