@@ -1,6 +1,5 @@
 package com.ead.payments.orders;
 
-
 import com.ead.payments.BaseEvent;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -13,9 +12,9 @@ import org.springframework.modulith.events.Externalized;
 
 @Data
 @ToString
-@Externalized
 @NoArgsConstructor
 @JsonTypeName("order_placed")
+@Externalized("orders-events.v1.topic::#{getId().toString()}")
 @AllArgsConstructor(onConstructor_ = @JsonCreator)
 public class OrderPlacedEvent extends BaseEvent {
 
