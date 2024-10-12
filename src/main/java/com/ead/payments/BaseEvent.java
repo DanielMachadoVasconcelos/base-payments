@@ -1,7 +1,5 @@
 package com.ead.payments;
 
-import com.ead.payments.orders.OrderPlacedEvent;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.AllArgsConstructor;
@@ -13,11 +11,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonTypeName(value = "type")
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME,  property = "type")
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = OrderPlacedEvent.class, name = "order_placed"),
-})
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public abstract class BaseEvent extends Message {
     private int version;
 }

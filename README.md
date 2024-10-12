@@ -88,7 +88,7 @@ curl --location --request POST 'localhost:5000/v1/orders' \
 
 Or access the database using the following command:
 ```bash
-//PGPASSWORD=password psql -U user -h localhost orders
+PGPASSWORD=password psql -U user -h localhost orders
 ```
 
 ### Kafka

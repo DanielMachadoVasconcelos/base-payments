@@ -11,8 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.ead.payments.SpringBootIntegrationTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Set;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +42,10 @@ class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
         // then: the response is 201
         response.andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(notNullValue())));
+                .andExpectAll(
+                        jsonPath("$.id", is(notNullValue())),
+                        jsonPath("$.currency", is("USD")),
+                        jsonPath("$.amount", is(100))
+                );
     }
 }
