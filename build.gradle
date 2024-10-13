@@ -42,6 +42,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.kafka:spring-kafka'
 
+	implementation 'io.axoniq.console:console-framework-client-spring-boot-starter:1.8.0'
+	implementation ('org.axonframework:axon-spring-boot-starter:4.10.1') {
+		exclude group: 'org.axonframework', module: 'axon-server-connector'
+	}
+
 	implementation 'org.springframework.modulith:spring-modulith-events-kafka'
 	implementation 'org.springframework.modulith:spring-modulith-events-api'
 	implementation 'org.springframework.modulith:spring-modulith-starter-core'

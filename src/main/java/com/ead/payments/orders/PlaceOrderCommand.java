@@ -1,19 +1,18 @@
 package com.ead.payments.orders;
 
-import com.ead.payments.BaseCommand;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.With;
+import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
-@Data
 @With
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-public class PlaceOrderCommand  extends BaseCommand {
+public class PlaceOrderCommand  {
 
-    private UUID id;
-    private String currency;
-    private Long amount;
+    @TargetAggregateIdentifier
+    private final UUID orderId;
+    private final String currency;
+    private final Long amount;
 }
