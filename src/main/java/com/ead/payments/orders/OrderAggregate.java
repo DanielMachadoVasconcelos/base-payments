@@ -1,6 +1,6 @@
 package com.ead.payments.orders;
 
-import com.ead.payments.AggregateRoot;
+import com.ead.payments.eventsourcing.AggregateRoot;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -21,6 +21,13 @@ public class OrderAggregate extends AggregateRoot {
     private Long amount;
 
     public OrderAggregate(PlaceOrderCommand command) {
+        Preconditions.checkNotNull(command.getId(), "The id is required");
+        Preconditions.checkNotNull(command.getCurrency(), "The currency is required");
+        Preconditions.checkArgument(!command.getCurrency().isBlank(), "The currency is required");
+        Preconditions.checkArgument(command.getCurrency().length() == 3, "The currency must be in ISO 4217 format");
+        Preconditions.checkNotNull(command.getAmount(), "The amount is required");
+        Preconditions.checkArgument(command.getAmount() > 0, "The amount must be greater than 0");
+
         raiseEvent(new OrderPlacedEvent(
                 command.getId(),
                 command.getCurrency(),
@@ -29,13 +36,6 @@ public class OrderAggregate extends AggregateRoot {
     }
 
     public void apply(OrderPlacedEvent event) {
-        Preconditions.checkNotNull(event.getId(), "The id is required");
-        Preconditions.checkNotNull(event.getCurrency(), "The currency is required");
-        Preconditions.checkArgument(!event.getCurrency().isBlank(), "The currency is required");
-        Preconditions.checkArgument(event.getCurrency().length() == 3, "The currency must be in ISO 4217 format");
-        Preconditions.checkNotNull(event.getAmount(), "The amount is required");
-        Preconditions.checkArgument(event.getAmount() > 0, "The amount must be greater than 0");
-
         this.id = event.getId();
         this.currency = event.getCurrency();
         this.amount = event.getAmount();

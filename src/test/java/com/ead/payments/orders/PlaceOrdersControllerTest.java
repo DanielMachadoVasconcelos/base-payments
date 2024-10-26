@@ -34,8 +34,9 @@ class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
         var request = new PlaceOrderRequest("USD", 100L);
 
         // when: the place order request is made
-        var response = mockMvc.perform(post("/v1/orders")
+        var response = mockMvc.perform(post("/orders")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("version", "1.0.0" )
                 .content(objectMapper.writeValueAsString(request))
         );
 

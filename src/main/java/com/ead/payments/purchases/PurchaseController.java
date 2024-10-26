@@ -1,6 +1,5 @@
-package com.ead.payments.inventory;
+package com.ead.payments.purchases;
 
-import com.ead.payments.orders.OrderPlacedEvent;
 import com.ead.payments.products.ProductCreatedEvent;
 import java.time.Duration;
 import lombok.AllArgsConstructor;
@@ -11,17 +10,11 @@ import org.springframework.stereotype.Service;
 @Log4j2
 @Service
 @AllArgsConstructor
-class InventoryController {
-
-    @ApplicationModuleListener
-    void on (OrderPlacedEvent event) throws InterruptedException {
-        Thread.sleep(Duration.ofSeconds(5));  // Simulate inventory update
-        log.info("Reserving the Product. Inventory updated: {}", event.toString());
-    }
+public class PurchaseController {
 
     @ApplicationModuleListener
     void on (ProductCreatedEvent event) throws InterruptedException {
         Thread.sleep(Duration.ofSeconds(2));  // Simulate inventory update
-        log.info("New Product created. SKU registered: {}", event.toString());
+        log.info("New Product created. Initiating purchase process: {}", event.toString());
     }
 }

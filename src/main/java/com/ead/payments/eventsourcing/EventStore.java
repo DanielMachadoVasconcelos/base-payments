@@ -1,4 +1,4 @@
-package com.ead.payments;
+package com.ead.payments.eventsourcing;
 
 import java.util.List;
 import java.util.UUID;

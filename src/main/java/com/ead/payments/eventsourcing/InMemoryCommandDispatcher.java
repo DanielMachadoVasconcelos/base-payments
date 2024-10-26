@@ -1,8 +1,5 @@
-package com.ead.payments.orders;
+package com.ead.payments.eventsourcing;
 
-import com.ead.payments.BaseCommand;
-import com.ead.payments.CommandDispatcher;
-import com.ead.payments.CommandHandlerMethod;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +12,7 @@ import static com.google.common.base.Preconditions.*;
 
 @Service
 @AllArgsConstructor
-public class OrderCommandDispatcher implements CommandDispatcher {
+public class InMemoryCommandDispatcher implements CommandDispatcher {
 
     private final Map<Class<? extends BaseCommand>, List<CommandHandlerMethod>> routes = new HashMap<>();
 

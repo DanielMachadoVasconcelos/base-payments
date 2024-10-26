@@ -1,6 +1,6 @@
 package com.ead.payments.orders;
 
-import com.ead.payments.ConcurrencyException;
+import com.ead.payments.eventsourcing.ConcurrencyException;
 import java.net.URI;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;

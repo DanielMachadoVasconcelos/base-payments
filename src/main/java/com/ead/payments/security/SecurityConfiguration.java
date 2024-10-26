@@ -46,11 +46,17 @@ public class SecurityConfiguration {
                 .roles("CUSTOMER")
                 .build();
 
-        UserDetails admin = User.withUsername("merchant")
+        UserDetails merchant = User.withUsername("merchant")
                 .password(passwordEncoder.encode("password"))
                 .roles("MERCHANT")
                 .build();
-        return new InMemoryUserDetailsManager(user, admin);
+
+        UserDetails admin = User.withUsername("marketing")
+                .password(passwordEncoder.encode("password"))
+                .roles("ADMIN")
+                .build();
+
+        return new InMemoryUserDetailsManager(user, merchant, admin);
     }
 
     @Bean

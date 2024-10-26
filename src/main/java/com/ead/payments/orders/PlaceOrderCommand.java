@@ -1,6 +1,6 @@
 package com.ead.payments.orders;
 
-import com.ead.payments.BaseCommand;
+import com.ead.payments.eventsourcing.BaseCommand;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.ead.payments;
+package com.ead.payments.eventsourcing;
 
 import java.util.List;
 import org.springframework.data.repository.ListCrudRepository;

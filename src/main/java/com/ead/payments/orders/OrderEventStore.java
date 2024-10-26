@@ -1,14 +1,15 @@
 package com.ead.payments.orders;
 
-import com.ead.payments.AggregateNotFoundException;
-import com.ead.payments.BaseEvent;
-import com.ead.payments.ConcurrencyException;
-import com.ead.payments.EventModel;
-import com.ead.payments.EventStore;
-import com.ead.payments.EventStoreRepository;
+import com.ead.payments.eventsourcing.AggregateNotFoundException;
+import com.ead.payments.eventsourcing.ConcurrencyException;
+import com.ead.payments.eventsourcing.BaseEvent;
+import com.ead.payments.eventsourcing.EventModel;
+import com.ead.payments.eventsourcing.EventStore;
+import com.ead.payments.eventsourcing.EventStoreRepository;
 import jakarta.transaction.Transactional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 public class OrderEventStore implements EventStore {
 
     private EventStoreRepository repository;
-    private OrderEventProducer producer;
+    private ApplicationEventPublisher producer;
 
     @Override
     public void saveEvents(UUID aggregatedId, Iterable<BaseEvent> events, int expectedVersion) {
@@ -57,7 +58,7 @@ public class OrderEventStore implements EventStore {
 
             var persistedEvent = repository.save(eventModel);
             if (!persistedEvent.getId().isEmpty()) {
-                producer.producer(event.getClass().getSimpleName(), event);
+                producer.publishEvent(event);
             }
         }
     }

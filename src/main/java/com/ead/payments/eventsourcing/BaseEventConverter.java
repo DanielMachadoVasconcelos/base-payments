@@ -1,4 +1,4 @@
-package com.ead.payments;
+package com.ead.payments.eventsourcing;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;

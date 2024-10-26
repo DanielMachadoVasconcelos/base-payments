@@ -1,6 +1,6 @@
 package com.ead.payments.orders;
 
-import com.ead.payments.CommandDispatcher;
+import com.ead.payments.eventsourcing.CommandDispatcher;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = "/v1/orders")
+@RequestMapping(path = "/orders")
 @RolesAllowed({"ROLE_MERCHANT", "ROLE_CUSTOMER"})
 public class OrderController {
 
     CommandDispatcher commandDispatcher;
 
-    @PostMapping
+    @PostMapping(headers = "version=1.0.0")
     @ResponseStatus(HttpStatus.CREATED)
     public PlaceOrderResponse placeOrder(@RequestBody @Valid @NotNull PlaceOrderRequest request) {
         var orderId = UUID.randomUUID();

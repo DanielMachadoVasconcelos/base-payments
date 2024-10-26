@@ -1,4 +1,4 @@
-package com.ead.payments;
+package com.ead.payments.eventsourcing;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -16,7 +16,6 @@ import lombok.Data;
 import java.util.Date;
 import lombok.NoArgsConstructor;
 import lombok.With;
-import org.checkerframework.checker.units.qual.C;
 
 @With
 @Data

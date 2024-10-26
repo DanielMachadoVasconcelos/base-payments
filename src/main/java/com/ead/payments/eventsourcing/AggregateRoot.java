@@ -1,4 +1,4 @@
-package com.ead.payments;
+package com.ead.payments.eventsourcing;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;

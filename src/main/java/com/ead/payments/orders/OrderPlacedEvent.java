@@ -1,6 +1,6 @@
 package com.ead.payments.orders;
 
-import com.ead.payments.BaseEvent;
+import com.ead.payments.eventsourcing.BaseEvent;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.UUID;
 import lombok.AllArgsConstructor;

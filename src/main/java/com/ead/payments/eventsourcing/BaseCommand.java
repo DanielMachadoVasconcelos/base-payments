@@ -1,4 +1,4 @@
-package com.ead.payments;
+package com.ead.payments.eventsourcing;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
