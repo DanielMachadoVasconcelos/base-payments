@@ -1,0 +1,108 @@
+spring:
+  application:
+    name: base-payments
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/orders
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
+    schema: orders
+
+  profiles:
+    active: local
+
+  sql:
+    init:
+      platform: postgresql
+      schema: orders
+
+  flyway:
+    baseline-on-migrate: true
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: ${spring.application.name}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    listener:
+      missing-topics-fatal: false
+
+  security:
+    enabled: true
+
+  jpa:
+    show-sql: true
+    format-sql: true
+    properties:
+      org.hibernate.envers.default_schema: orders
+      hibernate.default_schema: orders
+
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    serialization:
+      write-dates-as-timestamps: false
+
+  threads:
+    virtual:
+      enabled: true
+
+  docker:
+    compose:
+      lifecycle-management: start_only
+
+  modulith:
+    republish-outstanding-events: true
+    republish-outstanding-events-on-restart: true
+    events:
+      jdbc:
+        schema-initialization-enabled: true
+        schema: orders
+        table: events
+        snapshot-table: snapshots
+        snapshot-schema: orders
+        snapshot-events: 1000
+        snapshot-interval: 1000
+
+  doc:
+    swagger-ui:
+      path: /swagger-ui-html
+
+management:
+  metrics:
+    tags:
+      application: base-payments-service
+  endpoints:
+    security:
+      enabled: false
+    jmx:
+      exposure:
+        include: "*"
+    enabled-by-default: true
+    web:
+      exposure:
+        include: "*"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    instance-id: ${spring.application.name}:${server.port}
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+    statusPageUrlPath: /actuator/info              # URL path for info endpoint
+    healthCheckUrlPath: /actuator/health           # URL path for health endpoint
+    statusPageUrl: http://${eureka.instance.ip-address}:${server.port}/actuator/info  # Full status URL
+    healthCheckUrl: http://${eureka.instance.ip-address}:${server.port}/actuator/health # Full health URL
+    hostname: base-payments
+    ip-address: localhost # This is the IP address that Eureka will use to register the service
