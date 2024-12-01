@@ -1,7 +1,5 @@
 package com.ead.payments.products;
 
-
-import com.ead.payments.eventsourcing.CommandDispatcher;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -22,14 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RolesAllowed({"ROLE_ADMIN"})
 public class ProductController {
 
-    CommandDispatcher commandDispatcher;
+    ProductService productService;
 
     @PostMapping(headers = "version=1.0.0")
     @ResponseStatus(HttpStatus.CREATED)
     public CreateProductResponse createProduct(@RequestBody @Valid @NotNull  CreateProductRequest request) {
         var productId = UUID.randomUUID();
 
-        commandDispatcher.send(new CreateProductCommand(
+        productService.handle(new CreateProductCommand(
                 productId,
                 request.getSku(),
                 request.getName(),

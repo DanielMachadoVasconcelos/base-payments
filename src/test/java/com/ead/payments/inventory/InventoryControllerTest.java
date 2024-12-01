@@ -21,6 +21,7 @@ class InventoryControllerTest {
         var expectedOrderId = UUID.randomUUID();
         var orderPlacedEvent = new OrderPlacedEvent(
                 expectedOrderId,
+                0L,
                 "USD",
                 100L
         );

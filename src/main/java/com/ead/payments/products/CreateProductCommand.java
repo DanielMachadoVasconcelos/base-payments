@@ -1,6 +1,5 @@
 package com.ead.payments.products;
 
-import com.ead.payments.eventsourcing.BaseCommand;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -12,7 +11,7 @@ import lombok.With;
 @With
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateProductCommand extends BaseCommand {
+public class CreateProductCommand  {
 
     private UUID id;
     private String sku;

@@ -28,8 +28,8 @@ class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
 
     @Test
     @WithMockUser(username = "user", roles = "USER")
-    @DisplayName("Should return 201 when place order")
-    void shouldReturn201WhenPlaceOrder() throws Exception {
+    @DisplayName("Should allow to place an oder when no order lines were provided")
+    void shouldAllowToPlaceTheOrderWhenNoOrderLineWereProvided() throws Exception {
         // given: a valid place order request
         var request = new PlaceOrderRequest("USD", 100L);
 

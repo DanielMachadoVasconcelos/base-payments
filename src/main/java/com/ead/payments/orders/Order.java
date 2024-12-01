@@ -2,8 +2,9 @@ package com.ead.payments.orders;
 
 import java.util.UUID;
 
-public record PlaceOrderCommand(
+public record Order(
         UUID id,
+        long version,
         String currency,
         Long amount
 ) {

@@ -7,8 +7,8 @@ SET search_path TO orders;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Create the event_store table
-CREATE TABLE IF NOT EXISTS event_store (
-    id VARCHAR(255) PRIMARY KEY DEFAULT uuid_generate_v4(),
+CREATE TABLE IF NOT EXISTS order_events (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     aggregated_identifier VARCHAR(255) NOT NULL,
     aggregate_type VARCHAR(255) NOT NULL,
@@ -19,4 +19,21 @@ CREATE TABLE IF NOT EXISTS event_store (
 );
 
 -- Create an index on the aggregated_identifier column
-CREATE INDEX idx_aggregated_identifier ON event_store (aggregated_identifier);
+CREATE INDEX idx_aggregated_identifier ON order_events (aggregated_identifier);
+
+-- Create the order_status enum
+CREATE TYPE order_status AS ENUM ('CREATED', 'CONFIRMED', 'CANCELLED');
+
+-- Create the order table
+CREATE TABLE IF NOT EXISTS orders (
+    order_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    version INT NOT NULL CHECK (version >= 0) DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    order_status  order_status NOT NULL DEFAULT 'CREATED',
+    currency VARCHAR(3) NOT NULL,
+    amount INTEGER NOT NULL,
+    UNIQUE (order_id, version)
+);
+
+-- Create an index on the order_status column
+CREATE INDEX idx_order_status ON orders (order_status);
