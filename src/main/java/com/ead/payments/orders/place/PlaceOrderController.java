@@ -1,4 +1,4 @@
-package com.ead.payments.orders;
+package com.ead.payments.orders.place;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RequestMapping(path = "/orders")
 @RolesAllowed({"ROLE_MERCHANT", "ROLE_CUSTOMER"})
-public class OrderController {
+public class PlaceOrderController {
 
     PlaceOrderService placeOrderService;
 

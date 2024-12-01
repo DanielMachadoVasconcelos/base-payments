@@ -1,13 +1,12 @@
 package com.ead.payments.orders;
 
+import com.ead.payments.orders.place.PlaceOrderCommand;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Preconditions;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import jakarta.persistence.Version;
@@ -16,7 +15,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.authorization.method.AuthorizeReturnObject;

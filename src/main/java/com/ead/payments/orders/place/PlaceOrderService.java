@@ -1,5 +1,8 @@
-package com.ead.payments.orders;
+package com.ead.payments.orders.place;
 
+import com.ead.payments.orders.Order;
+import com.ead.payments.orders.OrderAggregate;
+import com.ead.payments.orders.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
