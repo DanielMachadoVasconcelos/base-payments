@@ -1,6 +1,5 @@
 package com.ead.payments.products;
 
-import com.ead.payments.eventsourcing.BaseEvent;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductCreatedEvent extends BaseEvent {
+public class ProductCreatedEvent {
 
     private UUID id;
     private String sku;

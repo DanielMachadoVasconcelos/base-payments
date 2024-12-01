@@ -1,6 +1,5 @@
 package com.ead.payments.orders;
 
-import com.ead.payments.eventsourcing.ConcurrencyException;
 import java.net.URI;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -24,17 +23,6 @@ public class OrderControlAdvice {
 
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
     public ResponseEntity<ProblemDetail> handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException ex) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.CONFLICT);
-        problemDetail.setTitle("Invalid Resource Version");
-        problemDetail.setDetail("The resource was updated by another transaction, please reload and try again.");
-        problemDetail.setType(URI.create("v1/orders"));
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(problemDetail);
-    }
-
-    @ExceptionHandler(ConcurrencyException.class)
-    public ResponseEntity<ProblemDetail> handleConcurrencyException(ConcurrencyException ex) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.CONFLICT);
         problemDetail.setTitle("Invalid Resource Version");
         problemDetail.setDetail("The resource was updated by another transaction, please reload and try again.");
