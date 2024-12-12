@@ -1,30 +1,33 @@
 package com.ead.payments.products;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.Value;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
+@ToString
+@AllArgsConstructor(onConstructor_ = @JsonCreator)
 public class ProductCreatedEvent {
 
-    private UUID id;
-    private String sku;
-    private String name;
-    private String description;
+     UUID id;
+     String sku;
+     String name;
+     String description;
 
-    private Long weight;
-    private Long height;
-    private Long width;
-    private Long length;
+     Long weight;
+     Long height;
+     Long width;
+     Long length;
 
-    private List<String> tags;
-    private List<String> categories;
-    private List<String> details;
+     List<String> tags;
+     List<String> categories;
+     List<String> details;
 
-    private String thumbnailUrl;
-    private  List<String> imagesUrls;
+     String thumbnailUrl;
+     List<String> imagesUrls;
 }

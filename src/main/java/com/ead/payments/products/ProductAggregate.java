@@ -17,6 +17,7 @@ import jakarta.persistence.Version;
 import java.util.List;
 import java.util.UUID;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.security.authorization.method.AuthorizeReturnObject;
@@ -25,6 +26,7 @@ import org.springframework.security.authorization.method.AuthorizeReturnObject;
 @NoArgsConstructor
 @AuthorizeReturnObject
 @Entity(name = "products")
+@EqualsAndHashCode(callSuper = false)
 @JsonSerialize(as = ProductAggregate.class)
 @JsonDeserialize(as = ProductAggregate.class)
 @JsonIgnoreProperties(ignoreUnknown = true)

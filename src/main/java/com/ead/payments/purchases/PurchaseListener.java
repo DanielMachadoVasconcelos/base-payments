@@ -5,12 +5,13 @@ import java.time.Duration;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.modulith.events.ApplicationModuleListener;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Log4j2
-@Service
+@Component
 @AllArgsConstructor
-public class PurchaseController {
+public class PurchaseListener {
 
     @ApplicationModuleListener
     void on (ProductCreatedEvent event) throws InterruptedException {

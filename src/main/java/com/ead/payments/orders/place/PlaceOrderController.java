@@ -32,8 +32,8 @@ public class PlaceOrderController {
         // TODO: make sure to allow the client of this API to place an order with its own ID
         var order = placeOrderService.handle(new PlaceOrderCommand(
                 orderId,
-                request.getCurrency(),
-                request.getAmount()
+                request.currency(),
+                request.amount()
         ));
 
         return new PlaceOrderResponse(

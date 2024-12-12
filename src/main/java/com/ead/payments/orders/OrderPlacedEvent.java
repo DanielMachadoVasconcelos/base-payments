@@ -11,11 +11,11 @@ import org.springframework.modulith.events.Externalized;
 @ToString
 @Externalized("orders-events.v1.topic::#{getId().toString()}")
 @AllArgsConstructor(onConstructor_ = @JsonCreator)
-public class OrderPlacedEvent  {
+public class OrderPlacedEvent {
 
-    private UUID id;
-    private Long version;
-    private String currency;
-    private Long amount;
+    UUID id;
+    Long version;
+    String currency;
+    Long amount;
 
 }

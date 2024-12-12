@@ -14,15 +14,19 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.authorization.method.AuthorizeReturnObject;
 
 @Data
+@ToString
 @NoArgsConstructor
 @AuthorizeReturnObject
 @Entity(name = "orders")
+@EqualsAndHashCode(callSuper = false)
 @JsonSerialize(as = OrderAggregate.class)
 @JsonDeserialize(as = OrderAggregate.class)
 @JsonIgnoreProperties(ignoreUnknown = true)

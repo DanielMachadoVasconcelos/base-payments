@@ -60,7 +60,7 @@ class GeneralExceptionHandler {
 				.map(Class::getSimpleName)
 				.orElse("request");
 
-		var details = STR."The '\{invalidClassName}' is invalid";
+		var details = "The '" + invalidClassName + "' is invalid";
 
 		ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
 		problemDetail.setTitle("Constraint Violation Exception");
