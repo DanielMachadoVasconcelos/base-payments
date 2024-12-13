@@ -24,6 +24,7 @@ public class PlaceOrderService {
         return new Order(
             aggregate.getId(),
             aggregate.getVersion(),
+            aggregate.getStatus(),
             aggregate.getCurrency(),
             aggregate.getAmount()
         );

@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Preconditions;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 
 import jakarta.persistence.Version;
@@ -39,6 +41,10 @@ public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate>  imple
     @Version
     private Long version;
 
+    @Column
+    @Enumerated(EnumType.STRING)
+    private Order.OrderStatus status;
+
     @NotNull
     private String currency;
 
@@ -57,15 +63,33 @@ public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate>  imple
 
         this.id = command.id();
         this.version = 0L;
+        this.status = Order.OrderStatus.PLACED;
         this.currency = command.currency();
         this.amount = command.amount();
 
         registerEvent(new OrderPlacedEvent(
                 command.id(),
                 version,
+                status,
                 command.currency(),
                 command.amount()
         ));
+    }
+
+    public OrderAggregate cancel() {
+        Preconditions.checkState(status == Order.OrderStatus.PLACED, "The order must be placed to be cancelled");
+
+        this.status = Order.OrderStatus.CANCELLED;
+
+        registerEvent(new OrderCancelledEvent(
+                id,
+                version,
+                status,
+                currency,
+                amount
+        ));
+
+        return this;
     }
 
     @Override

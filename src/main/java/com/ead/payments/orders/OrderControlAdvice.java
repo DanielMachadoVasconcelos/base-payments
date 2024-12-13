@@ -31,4 +31,15 @@ public class OrderControlAdvice {
                 .status(HttpStatus.CONFLICT)
                 .body(problemDetail);
     }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handleOrderNotFoundException(OrderNotFoundException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        problemDetail.setTitle("Order Not Found");
+        problemDetail.setDetail(ex.getMessage());
+        problemDetail.setType(URI.create("v1/orders"));
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(problemDetail);
+    }
 }

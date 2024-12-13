@@ -1,20 +1,23 @@
-package com.ead.payments.orders.search;
+package com.ead.payments.orders.cancel;
 
 import com.ead.payments.orders.Order;
+import com.ead.payments.orders.OrderAggregate;
 import com.ead.payments.orders.OrderRepository;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
-public class SearchOrderService {
+@AllArgsConstructor
+public class CancelOrderService {
 
-    final OrderRepository orderRepository;
+    OrderRepository orderRepository;
 
-    public Optional<Order> search(UUID orderId) {
+    public Optional<Order> handle(UUID orderId) {
         return orderRepository.findById(orderId)
+                .map(OrderAggregate::cancel)
+                .map(orderRepository::save)
                 .map(aggregate -> new Order(
                         aggregate.getId(),
                         aggregate.getVersion(),

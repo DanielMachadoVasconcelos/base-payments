@@ -1,5 +1,6 @@
 package com.ead.payments.inventory;
 
+import static com.ead.payments.orders.Order.OrderStatus.PLACED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.ead.payments.orders.OrderPlacedEvent;
@@ -22,6 +23,7 @@ class InventoryControllerTest {
         var orderPlacedEvent = new OrderPlacedEvent(
                 expectedOrderId,
                 0L,
+                PLACED,
                 "USD",
                 100L
         );

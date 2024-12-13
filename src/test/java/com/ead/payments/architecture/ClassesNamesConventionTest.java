@@ -15,6 +15,7 @@ class ClassesNamesConventionTest {
     private static final ArchRule classesShouldBeNamedOnlyWithTheAllowedSuffixes =
         classes().should().haveSimpleNameEndingWith("Application")
             .orShould().haveSimpleNameEndingWith("Handler")
+            .orShould().haveSimpleNameEndingWith("Exception")
             .orShould().haveSimpleNameEndingWith("Interceptor")
             .orShould().haveSimpleNameEndingWith("Advice")
             .orShould().haveSimpleNameEndingWith("Aggregate")
@@ -26,6 +27,7 @@ class ClassesNamesConventionTest {
             .orShould().haveSimpleNameEndingWith("Repository")
             .orShould().haveSimpleNameEndingWith("Configuration")
             .orShould().haveSimpleNameEndingWith("Entity")
+            .orShould().haveSimpleNameEndingWith("Status")
             .orShould().haveSimpleNameEndingWith("Event")
             .orShould().haveSimpleNameEndingWith("Command")
             .orShould().haveSimpleNameEndingWith("Mapper")

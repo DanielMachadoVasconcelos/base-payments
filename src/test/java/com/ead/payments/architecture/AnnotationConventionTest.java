@@ -6,17 +6,19 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
 @AnalyzeClasses(packages = "com.ead.payments", importOptions = ImportOption.DoNotIncludeTests.class)
 public class AnnotationConventionTest {
 
-    // This test will verify if classes name with suffix  Controller are annotated with @RestController
+    // This test will verify if classes name with suffix  Controller are annotated with @RestController  or @Controller
     @ArchTest
     private static final ArchRule classesNamedControllerShouldBeAnnotatedWithRestController =
         classes().that().haveSimpleNameEndingWith("Controller")
             .should().beAnnotatedWith(RestController.class)
-            .because("Classes named with suffix Controller should be annotated with @RestController");
+            .orShould().beAnnotatedWith(Controller.class)
+            .because("Classes named with suffix Controller should be annotated with @RestController or @Controller");
 
     // This test will verify if classes name with suffix  Service are annotated with @Service
     @ArchTest
@@ -45,4 +47,13 @@ public class AnnotationConventionTest {
         classes().that().haveSimpleNameEndingWith("Listener")
             .should().beAnnotatedWith(org.springframework.stereotype.Component.class)
             .because("Classes named with suffix Listener should be annotated with @Component");
+
+    // This test will verify if classes name with suffix  Mapper are annotated with @Mapper
+    @ArchTest
+    private static final ArchRule classesNamedMapperShouldBeAnnotatedWithMapper =
+        classes().that().haveSimpleNameEndingWith("Mapper")
+            .should().beAnnotatedWith(org.mapstruct.Mapper.class)
+            .because("Classes named with suffix Mapper should be annotated with @Mapper")
+                .allowEmptyShould(true);
+
 }
