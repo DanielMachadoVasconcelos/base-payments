@@ -33,6 +33,9 @@ class ClassesNamesConventionTest {
             .orShould().haveSimpleNameEndingWith("Mapper")
             .orShould().haveSimpleNameEndingWith("Request")
             .orShould().haveSimpleNameEndingWith("Response")
+            .orShould().haveSimpleNameEndingWith("Client")
+            .orShould().haveSimpleNameEndingWith("Gateway")
+            .orShould().haveSimpleNameEndingWith("Properties")
             .because("Classes should be named with the allowed suffixes");
 
     // This test will verify if the classes are written in english

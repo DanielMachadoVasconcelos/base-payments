@@ -32,7 +32,7 @@ import org.springframework.security.authorization.method.AuthorizeReturnObject;
 @JsonSerialize(as = OrderAggregate.class)
 @JsonDeserialize(as = OrderAggregate.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate>  implements  Persistable<UUID> {
+public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate> implements Persistable<UUID> {
 
     @Id
     @Column(name = "order_id", updatable = false, nullable = false)

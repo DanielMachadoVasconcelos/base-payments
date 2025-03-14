@@ -5,7 +5,7 @@
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                %magenta(%d{HH:mm:ss.SSSXXX})  %highlight(%-5level) --- %cyan([%15.15t]) %yellow(%logger{39}) : %msg %mdc%n%throwable
+                %magenta(%d{HH:mm:ss.SSSXXX})  %highlight(%-5level) [%X{correlation_id}] --- %cyan([%15.15t]) %yellow(%logger{39}) : %msg %mdc%n%throwable
             </pattern>
         </encoder>
     </appender>

@@ -63,6 +63,17 @@ services:
     depends_on:
       - kafka
 
+  wiremock:
+    image: rodolpheche/wiremock:latest
+    container_name: issuer-wiremock
+    networks:
+      - integration-test
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./wiremock:/home/wiremock
+    command: --global-response-templating --verbose
+
 volumes:
   kafka_data:
     driver: local

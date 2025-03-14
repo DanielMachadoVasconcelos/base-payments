@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/authorization",
+    "headers": {
+      "X-Mocked-Issuer": {
+        "equalTo": "approved",
+        "caseInsensitive": true
+      }
+    }
+  },
+  "response": {
+    "status": 201,
+    "jsonBody": {
+      "authorizationKrn": "krn:pay:auth:eu-west-1:{{now format='yyyyMMddHHmmss'}}:transaction:{{randomValue type='UUID'}}",
+      "status": "AUTHORIZED",
+      "statusReason": "VALID"
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "transformers": ["response-template"]
+  }
+}
