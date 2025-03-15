@@ -65,14 +65,6 @@ jobs:
         with:
           files: '**/build/test-results/test/*.xml'  # Make sure Gradle produces JUnit-style XML test reports
 
-      # Archive Test Reports as Artifacts
-      - name: Upload Test Reports
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: Test Reports
-          path: '**/build/reports/tests/test'  # Upload HTML test reports
-
       # Clean up Docker Compose resources
       - name: Clean up Docker Compose
         run: docker compose down
