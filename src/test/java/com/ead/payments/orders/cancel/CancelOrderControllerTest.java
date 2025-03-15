@@ -13,7 +13,6 @@ import com.ead.payments.orders.place.PlaceOrderResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -38,6 +37,7 @@ class CancelOrderControllerTest extends SpringBootIntegrationTest {
         var orderPlacedResponse = mockMvc.perform(post("/orders")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("version", "1.0.0")
+                .header("X-Correlation-ID", expectedAuthorizedCorrelationId)
                 .content(objectMapper.writeValueAsString(request))
         );
 

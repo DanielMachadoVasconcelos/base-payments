@@ -15,7 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 @RequiredArgsConstructor
-public class CorrelationIdInterceptor extends OncePerRequestFilter {
+public class CorrelationIdLoggingInterceptor extends OncePerRequestFilter {
 
     private static final String CORRELATION_ID_HEADER = "X-Correlation-ID";
     private static final String CORRELATION_ID_KEY = "correlationId";

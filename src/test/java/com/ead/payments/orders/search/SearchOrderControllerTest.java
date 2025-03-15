@@ -38,6 +38,7 @@ class SearchOrderControllerTest extends SpringBootIntegrationTest {
         var orderPlacedResponse = mockMvc.perform(post("/orders")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("version", "1.0.0")
+                .header("X-Correlation-ID", expectedAuthorizedCorrelationId)
                 .content(objectMapper.writeValueAsString(request))
         );
 
