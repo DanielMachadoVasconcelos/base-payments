@@ -1,5 +1,7 @@
 package com.ead.payments.orders;
 
+import static com.ead.payments.orders.Order.OrderStatus;
+
 import com.ead.payments.orders.place.PlaceOrderCommand;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -10,7 +12,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
-
 import jakarta.persistence.Version;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -43,7 +44,7 @@ public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate> implem
 
     @Column
     @Enumerated(EnumType.STRING)
-    private Order.OrderStatus status;
+    private OrderStatus status;
 
     @NotNull
     private String currency;
@@ -63,7 +64,7 @@ public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate> implem
 
         this.id = command.id();
         this.version = 0L;
-        this.status = Order.OrderStatus.PLACED;
+        this.status = OrderStatus.PLACED;
         this.currency = command.currency();
         this.amount = command.amount();
 
@@ -77,9 +78,9 @@ public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate> implem
     }
 
     public OrderAggregate cancel() {
-        Preconditions.checkState(status == Order.OrderStatus.PLACED, "The order must be placed to be cancelled");
+        Preconditions.checkState(status != OrderStatus.COMPLETED, "The order is already completed");
 
-        this.status = Order.OrderStatus.CANCELLED;
+        this.status = OrderStatus.CANCELLED;
 
         registerEvent(new OrderCancelledEvent(
                 id,

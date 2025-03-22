@@ -45,7 +45,7 @@ public class SpringBootIntegrationTest {
                                         .withHeader("Content-Type", "application/json")
                                         .withBody(STR."""
                                                 {
-                                                  "authorizationKrn": "krn:pay:auth:eu-west-1:{{now format='yyyyMMddHHmmss'}}:transaction:{{randomValue type='UUID'}}",
+                                                  "authorizationKrn": "krn:payments:authorization:eu-west-1:{{now format='yyyyMMddHHmmss'}}:transaction:{{randomValue type='UUID'}}?version=1.0.0",
                                                   "status": "AUTHORIZED",
                                                   "statusReason": null
                                                 }
