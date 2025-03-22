@@ -23,7 +23,7 @@ import org.wiremock.spring.InjectWireMock;
 @AutoConfigureMockMvc
 @ActiveProfiles("integration-test")
 @Execution(ExecutionMode.CONCURRENT)
-@EnableWireMock({@ConfigureWireMock(name = "issuer-service", baseUrlProperties = "localhost", port = 8081)})
+@EnableWireMock({@ConfigureWireMock(name = "issuer-service", baseUrlProperties = "localhost", port = 6580)})
 public class SpringBootIntegrationTest {
 
     @InjectWireMock("issuer-service")
