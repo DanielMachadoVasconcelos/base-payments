@@ -1,21 +1,13 @@
 package com.ead.payments.orders;
 
-import static com.ead.payments.orders.Order.OrderStatus;
-
 import com.ead.payments.orders.place.PlaceOrderCommand;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Preconditions;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.Version;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -23,6 +15,10 @@ import lombok.ToString;
 import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.authorization.method.AuthorizeReturnObject;
+
+import java.util.UUID;
+
+import static com.ead.payments.orders.Order.OrderStatus;
 
 @Data
 @ToString
@@ -63,7 +59,7 @@ public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate> implem
         Preconditions.checkArgument(command.amount() > 0, "The amount must be greater than 0");
 
         this.id = command.id();
-        this.version = 0L;
+        //this.version = 0L;
         this.status = OrderStatus.PLACED;
         this.currency = command.currency();
         this.amount = command.amount();

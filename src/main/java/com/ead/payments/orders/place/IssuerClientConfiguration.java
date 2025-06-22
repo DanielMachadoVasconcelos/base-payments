@@ -30,7 +30,7 @@ public class IssuerClientConfiguration {
                                 .header("X-Trace-ID", MDC.get("traceId"))
                                 .header("X-Mocked-Issuer", MDC.get("x-mocked-issuer"))
                 )
-                .baseUrl(STR."http://\{host}:\{port}")
+                .baseUrl("http://" + host + ":" + port)
                 .requestFactory(requestFactory)
                 .defaultHeader("Content-Type", "application/json")
                 .build();

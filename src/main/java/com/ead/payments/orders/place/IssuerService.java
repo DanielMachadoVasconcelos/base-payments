@@ -1,10 +1,11 @@
 package com.ead.payments.orders.place;
 
 import com.google.common.base.Preconditions;
-import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -28,7 +29,7 @@ public class IssuerService {
             return switch (response.getStatus().toUpperCase()) {
                 case "AUTHORIZED" -> new ApprovedAuthorization(new AuthorizationKrn(response.getAuthorizationKrn()));
                 case "REJECTED" -> new RejectedAuthorization(response.getStatus(), response.getStatusReason());
-                default -> throw new UnknownAuthorizationStatus(STR."Unknown authorization status: \{response.getStatus()}. The result of the authorization request is unknown and can't be parsed.");
+                default -> throw new UnknownAuthorizationStatus("Unknown authorization status: " + response.getStatus() + ". The result of the authorization request is unknown and can't be parsed.");
             };
         }
     }
@@ -39,7 +40,7 @@ public class IssuerService {
     record AuthorizationKrn(String value) {
 
         private static final Pattern AUTH_KRN_PATTERN = Pattern.compile(
-            "^krn:payments:authorization:[a-z]{2,3}-[a-z]+-\\d+:\\d{14}:transaction:[0-9a-fA-F\\-]{36}(?:\\?version=\\d+\\.\\d+\\.\\d+)?$"
+                "^krn:(payments|pay):(authorization|auth):[a-z]{2,3}-[a-z]+-\\d+:\\d{14}:transaction:[0-9a-fA-F\\-]{36}(?:\\?version=\\d+\\.\\d+\\.\\d+)?$"
         );
 
         public AuthorizationKrn {
@@ -47,9 +48,8 @@ public class IssuerService {
             Preconditions.checkArgument(!value.isBlank(), "AuthorizationKrn value can't be blank");
             Preconditions.checkArgument(
                     AUTH_KRN_PATTERN.matcher(value).matches(),
-                    STR."AuthorizationKrn value is not in the correct format: \{value}"
+                    "AuthorizationKrn value is not in the correct format: " + value
             );
         }
     }
 }
-

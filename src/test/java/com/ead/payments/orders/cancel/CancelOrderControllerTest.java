@@ -1,12 +1,5 @@
 package com.ead.payments.orders.cancel;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.ead.payments.SpringBootIntegrationTest;
 import com.ead.payments.orders.place.PlaceOrderRequest;
 import com.ead.payments.orders.place.PlaceOrderResponse;
@@ -17,6 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class CancelOrderControllerTest extends SpringBootIntegrationTest {
 
@@ -46,7 +46,7 @@ class CancelOrderControllerTest extends SpringBootIntegrationTest {
                 PlaceOrderResponse.class).getId();
 
         // when: the cancel order request is made
-        var response = mockMvc.perform(post(STR."/orders/\{orderId}/cancel")
+        var response = mockMvc.perform(post("/orders/" + orderId + "/cancel")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("version", "1.0.0")
         );

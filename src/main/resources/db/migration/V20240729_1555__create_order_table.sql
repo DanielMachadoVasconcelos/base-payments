@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS order_events (
 );
 
 -- Create an index on the aggregated_identifier column
-CREATE INDEX idx_aggregated_identifier ON order_events (aggregated_identifier);
+CREATE INDEX IF NOT EXISTS idx_aggregated_identifier ON order_events (aggregated_identifier);
 
 -- Create the order_status enum
 CREATE TYPE order_status AS ENUM ('CREATED', 'CONFIRMED', 'CANCELLED');
@@ -36,4 +36,4 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 
 -- Create an index on the order_status column
-CREATE INDEX idx_order_status ON orders (order_status);
+CREATE INDEX IF NOT EXISTS idx_order_status ON orders (order_status);

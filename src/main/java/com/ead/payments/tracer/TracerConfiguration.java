@@ -22,7 +22,7 @@ class TracerConfiguration {
         // Inicializa o Brave Tracing
         Tracing braveTracing = Tracing.newBuilder()
                 .currentTraceContext(braveCurrentTraceContext)
-                .sampler(Sampler.ALWAYS_SAMPLE) // Sempre coletar traces (ideal para testes)
+                .sampler(Sampler.ALWAYS_SAMPLE)
                 .build();
 
         // Criar o Bridge do Brave para Micrometer

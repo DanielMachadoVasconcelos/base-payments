@@ -1,13 +1,5 @@
 package com.ead.payments.orders.search;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.ead.payments.SpringBootIntegrationTest;
 import com.ead.payments.orders.place.PlaceOrderRequest;
 import com.ead.payments.orders.place.PlaceOrderResponse;
@@ -18,6 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class SearchOrderControllerTest extends SpringBootIntegrationTest {
 
@@ -47,7 +47,7 @@ class SearchOrderControllerTest extends SpringBootIntegrationTest {
                 PlaceOrderResponse.class).getId();
 
         // when: the search order request is made
-        var response = mockMvc.perform(get(STR."/orders/\{orderId}")
+        var response = mockMvc.perform(get("/orders/" + orderId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("version", "1.0.0")
         );

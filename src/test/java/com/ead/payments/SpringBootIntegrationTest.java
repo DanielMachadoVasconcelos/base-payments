@@ -1,12 +1,8 @@
 package com.ead.payments;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import io.micrometer.observation.tck.TestObservationRegistry;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -18,6 +14,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.wiremock.spring.ConfigureWireMock;
 import org.wiremock.spring.EnableWireMock;
 import org.wiremock.spring.InjectWireMock;
+
+import java.util.UUID;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -43,13 +44,11 @@ public class SpringBootIntegrationTest {
                                         .withStatus(201)
                                         .withTransformers("response-template")
                                         .withHeader("Content-Type", "application/json")
-                                        .withBody(STR."""
-                                                {
-                                                  "authorizationKrn": "krn:payments:authorization:eu-west-1:{{now format='yyyyMMddHHmmss'}}:transaction:{{randomValue type='UUID'}}?version=1.0.0",
-                                                  "status": "AUTHORIZED",
-                                                  "statusReason": null
-                                                }
-                                                """
+                                        .withBody("{\n" +
+                                                "  \"authorizationKrn\": \"krn:payments:authorization:eu-west-1:{{now format='yyyyMMddHHmmss'}}:transaction:{{randomValue type='UUID'}}?version=1.0.0\",\n" +
+                                                "  \"status\": \"AUTHORIZED\",\n" +
+                                                "  \"statusReason\": null\n" +
+                                                "}"
                                         )
                         )
         );
