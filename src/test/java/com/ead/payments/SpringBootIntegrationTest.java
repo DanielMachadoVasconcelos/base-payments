@@ -23,8 +23,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("integration-test")
-@Execution(ExecutionMode.SAME_THREAD)
-@EnableWireMock({@ConfigureWireMock(name = "issuer-service", baseUrlProperties = "localhost", port = 6580)})
+@Execution(ExecutionMode.CONCURRENT)
+@EnableWireMock({@ConfigureWireMock(name = "issuer-service", baseUrlProperties = "issuer.client.base-url")})
 public class SpringBootIntegrationTest {
 
     @InjectWireMock("issuer-service")
