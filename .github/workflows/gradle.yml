@@ -67,7 +67,7 @@ jobs:
       - name: Run Tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: test -Djava.compiler.args="--enable-preview"
+          arguments: test -Djava.compiler.args="--enable-preview" --parallel
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
@@ -90,7 +90,7 @@ jobs:
       - name: Package
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build -x test --info
+          arguments: bootJar --aot -Djava.compiler.args="--enable-preview" -x test --info
 
   deploy:
     needs: package
