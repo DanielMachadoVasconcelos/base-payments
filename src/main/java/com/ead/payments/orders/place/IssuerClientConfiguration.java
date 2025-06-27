@@ -21,8 +21,7 @@ public class IssuerClientConfiguration {
 
     @Bean
     public RestClient defaultClient(ClientHttpRequestFactory requestFactory,
-                                    @Value("${issuer.client.host}") String host,
-                                    @Value("${issuer.client.port}") String port
+                                    @Value("${issuer.client.base-url}") String baseUrl
     ) {
         return RestClient.builder()
                 .defaultRequest(request ->
@@ -30,7 +29,7 @@ public class IssuerClientConfiguration {
                                 .header("X-Trace-ID", MDC.get("traceId"))
                                 .header("X-Mocked-Issuer", MDC.get("x-mocked-issuer"))
                 )
-                .baseUrl("http://" + host + ":" + port)
+                .baseUrl(baseUrl)
                 .requestFactory(requestFactory)
                 .defaultHeader("Content-Type", "application/json")
                 .build();
