@@ -28,13 +28,6 @@ jobs:
           java-version: '24'
           distribution: 'temurin'
 
-      - name: Check Docker Compose Version
-        run: docker compose --version
-
-      - name: Start Docker Services
-        run: docker compose up -d
-        timeout-minutes: 5
-
   build:
     needs: setup
     runs-on: ubuntu-latest
@@ -64,16 +57,28 @@ jobs:
           java-version: '24'
           distribution: 'temurin'
 
+      - name: Check Docker Compose Version
+        run: docker compose --version
+
+      - name: Start Docker Services
+        run: docker compose up -d
+        timeout-minutes: 5
+
       - name: Run Tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: test -Djava.compiler.args="--enable-preview" --parallel
+          arguments: test -Djava.compiler.args="--enable-preview" --parallel -Dspring.docker.compose.skip.in-tests=true
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           files: '**/build/test-results/test/*.xml'
+
+      - name: Stop Docker Services
+        if: always()
+        run: docker compose down -v
+        timeout-minutes: 5
 
   package:
     needs: test
