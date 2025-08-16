@@ -11,14 +11,11 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
+public class PlaceOrderUnauthorizedControllerTest extends SpringBootIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -28,13 +25,12 @@ class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
 
     @Test
     @WithMockUser(username = "user", roles = "USER")
-    @DisplayName("Should allow to place an oder when no order lines were provided")
-    void shouldAllowToPlaceTheOrderWhenNoOrderLineWereProvided() throws Exception {
-
+    @DisplayName("Should not allow to place the order when the issuer do not authorize the payment")
+    void shouldNotAllowToPlaceTheOrderWhenTheIssuerDoNotAuthorizeThePayment() throws Exception {
         //setup: issuer service with an authorized response
         CorrelationId expectedCorrelationId = CorrelationId.random();
         TestMocks.setup(issuerService())
-                .toAcceptTheAuthorizationWith(expectedCorrelationId);
+                 .toRejectTheAuthorizationWith(expectedCorrelationId);
 
         // given: a valid place order request
         var request = new PlaceOrderRequest("USD", 100L);
@@ -43,14 +39,11 @@ class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
         var response = mockMvc.perform(post("/orders")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("version", "1.0.0")
-                .header("X-Correlation-ID", expectedCorrelationId) // distinct correlation ID for each request to ensure wiremock stubs are matched
+                .header("X-Correlation-ID", expectedCorrelationId)
                 .content(objectMapper.writeValueAsString(request)));
 
-        // then: the response is 201
+        // then: the response is 401
         response.andDo(print())
-                .andExpect(status().isCreated())
-                .andExpectAll(jsonPath("$.id", is(notNullValue())),
-                        jsonPath("$.currency", is("USD")),
-                        jsonPath("$.amount", is(100)));
+                .andExpect(status().isUnauthorized());
     }
 }

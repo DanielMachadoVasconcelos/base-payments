@@ -1,29 +1,44 @@
+version: "3.8"
+
 services:
   postgres:
-    image: 'postgres:latest'
+    container_name: postgres
+    image: postgres:latest
     networks:
       - integration-test
     volumes:
-      - "postgres_data:/var/lib/postgresql/data"
+      - postgres_data:/var/lib/postgresql/data
     environment:
-      - 'POSTGRES_DB=orders'
-      - 'POSTGRES_PASSWORD=password'
-      - 'POSTGRES_USER=user'
+      POSTGRES_DB: orders
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
     ports:
       - '5432:5432'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d orders"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   pgadmin:
     container_name: pgadmin4
     image: dpage/pgadmin4
-    volumes:
-      - "pgadmin4_data:/var/lib/pgadmin"
+    restart: always
     networks:
       - integration-test
+    volumes:
+      - pgadmin4_data:/var/lib/pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "5050:80"
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO - http://localhost:80/misc/ping || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      start_period: 120s
+      retries: 3
 
   kafka:
     image: bitnami/kafka:latest
@@ -31,20 +46,25 @@ services:
     networks:
       - integration-test
     environment:
-      - KAFKA_CFG_KRAFT_MODE=controller
-      - KAFKA_CFG_NODE_ID=1
-      - KAFKA_CFG_PROCESS_ROLES=broker,controller
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
-      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-      - ALLOW_PLAINTEXT_LISTENER=yes
+      KAFKA_CFG_KRAFT_MODE: controller
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_CFG_PROCESS_ROLES: broker,controller
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      ALLOW_PLAINTEXT_LISTENER: "yes"
     ports:
       - "9092:9092"
     volumes:
       - kafka_data:/bitnami/kafka
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
 
   akhq:
     image: tchiotludo/akhq:latest
@@ -61,7 +81,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
 
   wiremock:
     image: rodolpheche/wiremock:latest
@@ -73,14 +94,16 @@ services:
     volumes:
       - ./wiremock:/home/wiremock
     command: --global-response-templating --verbose
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/__admin || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   kafka_data:
-    driver: local
   postgres_data:
-    driver: local
   pgadmin4_data:
-    driver: local
 
 networks:
   integration-test:

@@ -113,6 +113,8 @@ test {
 		events "skipped", "failed"
 	}
 
+	maxParallelForks = Runtime.runtime.availableProcessors()
+
 	systemProperty("junit.jupiter.conditions.deactivate", "*")
 	systemProperty("junit.jupiter.extensions.autodetection.enabled", true)
 	systemProperty("junit.jupiter.testinstance.lifecycle.default", "per_class")
