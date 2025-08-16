@@ -1,2 +1,2 @@
 -- Add column status to orders table
-ALTER TABLE orders.orders ADD COLUMN status VARCHAR(128) NOT NULL DEFAULT 'PLACED';
+ALTER TABLE orders.orders ADD COLUMN IF NOT EXISTS status VARCHAR(128) NOT NULL DEFAULT 'PLACED';
