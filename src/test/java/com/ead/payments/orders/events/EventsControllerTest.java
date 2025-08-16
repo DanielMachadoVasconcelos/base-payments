@@ -1,9 +1,12 @@
 package com.ead.payments.orders.events;
 
 import com.ead.payments.SpringBootIntegrationTest;
+import com.ead.payments.logging.CorrelationId;
+import com.ead.payments.mocks.TestMocks;
 import com.ead.payments.orders.place.PlaceOrderRequest;
 import com.ead.payments.orders.place.PlaceOrderResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +30,22 @@ class EventsControllerTest extends SpringBootIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    CorrelationId expectedCorrelationId;
+
+    @BeforeEach
+    @DisplayName("Setup: issuer service with an authorized response")
+    void beforeEach() {
+        //setup: issuer service with an authorized response
+        expectedCorrelationId = CorrelationId.random();
+        TestMocks.setup(issuerService())
+                .toAcceptTheAuthorizationWith(expectedCorrelationId);
+    }
+
     @Test
     @WithMockUser(username = "user", roles = "USER")
     @DisplayName("Should allow to retrieve all events for when reading an order history")
     void shouldAllowToRetrieveAllEventsForWhenReadingAnOrderHistory() throws Exception {
+
         // given: a valid place order request
         var request = new PlaceOrderRequest("USD", 100L);
 
@@ -38,7 +53,7 @@ class EventsControllerTest extends SpringBootIntegrationTest {
         var orderPlacedResponse = mockMvc.perform(post("/orders")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("version", "1.0.0")
-                .header("X-Correlation-ID", expectedAuthorizedCorrelationId)
+                .header("X-Correlation-ID", expectedCorrelationId)
                 .content(objectMapper.writeValueAsString(request))
         );
 
@@ -71,7 +86,7 @@ class EventsControllerTest extends SpringBootIntegrationTest {
         var orderPlacedResponse = mockMvc.perform(post("/orders")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("version", "1.0.0")
-                .header("X-Correlation-ID", expectedAuthorizedCorrelationId)
+                .header("X-Correlation-ID", expectedCorrelationId)
                 .content(objectMapper.writeValueAsString(request))
         );
 
