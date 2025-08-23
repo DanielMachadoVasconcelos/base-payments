@@ -1,0 +1,101 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "type": "dashboard",
+        "name": "Annotations & Alerts",
+        "enable": true,
+        "hide": true
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "type": "graph",
+      "title": "JVM Memory Used",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(jvm_memory_used_bytes{area=\"heap\"})",
+          "legendFormat": "heap"
+        },
+        {
+          "expr": "sum(jvm_memory_used_bytes{area=\"nonheap\"})",
+          "legendFormat": "non-heap"
+        }
+      ],
+      "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8}
+    },
+    {
+      "type": "graph",
+      "title": "Process CPU Usage",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "avg(process_cpu_usage)",
+          "legendFormat": "cpu"
+        }
+      ],
+      "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8}
+    },
+    {
+      "type": "graph",
+      "title": "HTTP Server Requests (count)",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(increase(http_server_requests_seconds_count[5m])) by (status)",
+          "legendFormat": "{{status}}"
+        }
+      ],
+      "gridPos": {"x": 0, "y": 8, "w": 24, "h": 8}
+    },
+    {
+      "type": "graph",
+      "title": "Create Order latency p95/p99",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{uri=\"/orders\",method=\"POST\"}[5m])) by (le))",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{uri=\"/orders\",method=\"POST\"}[5m])) by (le))",
+          "legendFormat": "p99"
+        }
+      ],
+      "gridPos": {"x": 0, "y": 16, "w": 24, "h": 8}
+    },
+    {
+      "type": "graph",
+      "title": "Create Order breakdown (avg over 5m)",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(rate(orders_place_authorization_seconds_sum[5m])) / sum(rate(orders_place_authorization_seconds_count[5m]))",
+          "legendFormat": "authorization avg"
+        },
+        {
+          "expr": "sum(rate(orders_place_persist_seconds_sum[5m])) / sum(rate(orders_place_persist_seconds_count[5m]))",
+          "legendFormat": "persist avg"
+        }
+      ],
+      "gridPos": {"x": 0, "y": 24, "w": 24, "h": 8}
+    }
+  ],
+  "schemaVersion": 16,
+  "style": "dark",
+  "tags": ["spring", "micrometer"],
+  "templating": {"list": []},
+  "time": {"from": "now-6h", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Spring Boot Overview",
+  "version": 1
+}

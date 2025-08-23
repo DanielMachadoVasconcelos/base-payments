@@ -100,10 +100,58 @@ services:
       timeout: 5s
       retries: 5
 
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: postgres-exporter
+    networks:
+      - integration-test
+    environment:
+      - DATA_SOURCE_NAME=postgresql://user:password@postgres:5432/orders?sslmode=disable
+    expose:
+      - "9187"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  prometheus:
+    image: 'prom/prometheus:v2.14.0'
+    container_name: prometheus
+    networks:
+      - integration-test
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - '9191:9090'
+    command: '--config.file=/etc/prometheus/config.yml'
+    volumes:
+      - './prometheus.yml:/etc/prometheus/config.yml'
+      - prometheus_data:/prometheus
+
+  grafana:
+    container_name: grafana
+    image: 'grafana/grafana:10.4.7'
+    networks:
+      - integration-test
+    depends_on:
+      prometheus:
+        condition: service_started
+    ports:
+      - '3000:3000'
+    environment:
+      GF_INSTALL_PLUGINS: ""
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+
 volumes:
   kafka_data:
   postgres_data:
   pgadmin4_data:
+  prometheus_data:
+  grafana_data:
 
 networks:
   integration-test:
