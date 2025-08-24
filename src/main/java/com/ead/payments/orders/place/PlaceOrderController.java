@@ -1,18 +1,15 @@
 package com.ead.payments.orders.place;
 
+import io.micrometer.observation.annotation.Observed;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -25,6 +22,7 @@ public class PlaceOrderController {
 
     @PostMapping(headers = "version=1.0.0")
     @ResponseStatus(HttpStatus.CREATED)
+    @Observed(name = "http.orders.create", contextualName = "POST /orders")
     public PlaceOrderResponse placeOrder(@RequestBody @Valid @NotNull PlaceOrderRequest request) {
 
         UUID orderId = UUID.randomUUID();

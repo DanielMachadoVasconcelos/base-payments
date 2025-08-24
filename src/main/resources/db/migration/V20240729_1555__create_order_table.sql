@@ -21,8 +21,13 @@ CREATE TABLE IF NOT EXISTS order_events (
 -- Create an index on the aggregated_identifier column
 CREATE INDEX IF NOT EXISTS idx_aggregated_identifier ON order_events (aggregated_identifier);
 
--- Create the order_status enum
-CREATE TYPE order_status AS ENUM ('CREATED', 'CONFIRMED', 'CANCELLED');
+-- Create the order_status enum if it doesn't exist
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'order_status') THEN
+        CREATE TYPE order_status AS ENUM ('CREATED', 'CONFIRMED', 'CANCELLED');
+    END IF;
+END$$;
 
 -- Create the order table
 CREATE TABLE IF NOT EXISTS orders (

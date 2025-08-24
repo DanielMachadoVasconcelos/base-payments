@@ -1,6 +1,8 @@
 package com.ead.payments.orders.cancel;
 
 import com.ead.payments.SpringBootIntegrationTest;
+import com.ead.payments.logging.CorrelationId;
+import com.ead.payments.mocks.TestMocks;
 import com.ead.payments.orders.place.PlaceOrderRequest;
 import com.ead.payments.orders.place.PlaceOrderResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +32,11 @@ class CancelOrderControllerTest extends SpringBootIntegrationTest {
     @WithMockUser(username = "user", roles = "USER")
     @DisplayName("Should allow to cancel an order by id when the order exists")
     void shouldAllowToCancelAnOrderByIdWhenTheOrderExists() throws Exception {
+        //setup: issuer service with an authorized response
+        CorrelationId expectedCorrelationId = CorrelationId.random();
+        TestMocks.setup(issuerService())
+                .toAcceptTheAuthorizationWith(expectedCorrelationId);
+
         // given: a valid place order request
         var request = new PlaceOrderRequest("USD", 100L);
 
@@ -37,7 +44,7 @@ class CancelOrderControllerTest extends SpringBootIntegrationTest {
         var orderPlacedResponse = mockMvc.perform(post("/orders")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("version", "1.0.0")
-                .header("X-Correlation-ID", expectedAuthorizedCorrelationId)
+                .header("X-Correlation-ID", expectedCorrelationId)
                 .content(objectMapper.writeValueAsString(request))
         );
 
