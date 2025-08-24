@@ -16,6 +16,7 @@ import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.authorization.method.AuthorizeReturnObject;
 
+import java.util.Currency;
 import java.util.UUID;
 
 import static com.ead.payments.orders.Order.OrderStatus;
@@ -43,7 +44,7 @@ public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate> implem
     private OrderStatus status;
 
     @NotNull
-    private String currency;
+    private Currency currency;
 
     @Min(0)
     @NotNull
@@ -51,10 +52,6 @@ public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate> implem
 
     public OrderAggregate(PlaceOrderCommand command) {
         Preconditions.checkNotNull(command.currency(), "The currency is required");
-
-        Preconditions.checkArgument(!command.currency().isBlank(), "The currency is required");
-        Preconditions.checkArgument(command.currency().length() == 3, "The currency must be in ISO 4217 format");
-
         Preconditions.checkNotNull(command.amount(), "The amount is required");
         Preconditions.checkArgument(command.amount() > 0, "The amount must be greater than 0");
 

@@ -1,8 +1,6 @@
 package com.ead.payments.orders.place;
 
 import com.ead.payments.SpringBootIntegrationTest;
-import com.ead.payments.logging.CorrelationId;
-import com.ead.payments.mocks.TestMocks;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class PlaceOrderUnauthorizedControllerTest extends SpringBootIntegrationTest {
+public class PlaceInvalidOrderControllerTet extends SpringBootIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -27,25 +25,25 @@ public class PlaceOrderUnauthorizedControllerTest extends SpringBootIntegrationT
 
     @Test
     @WithMockUser(username = "user", roles = "USER")
-    @DisplayName("Should not allow to place the order when the issuer do not authorize the payment")
-    void shouldNotAllowToPlaceTheOrderWhenTheIssuerDoNotAuthorizeThePayment() throws Exception {
-        //setup: issuer service with an authorized response
-        CorrelationId expectedCorrelationId = CorrelationId.random();
-        TestMocks.setup(issuerService())
-                 .toRejectTheAuthorizationWith(expectedCorrelationId);
+    @DisplayName("should not allow to place the order when the order is invalid")
+    public void shouldNotAllowToPlaceTheOrderWhenTheOrderIsInvalid() throws Exception {
 
-        // given: a valid place order request
-        var request = new PlaceOrderRequest(Currency.getInstance("USD"), 100L);
+        // given: an invalid place order request
+        PlaceOrderRequest placeOrderRequest = new PlaceOrderRequest(
+                Currency.getInstance("USD"),
+                -1200L
+        );
 
         // when: the place order request is made
         var response = mockMvc.perform(post("/orders")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("version", "1.0.0")
-                .header("X-Correlation-ID", expectedCorrelationId)
-                .content(objectMapper.writeValueAsString(request)));
+                .content(objectMapper.writeValueAsString(placeOrderRequest))
+        );
 
-        // then: the response is 401
+        // then: the response is 400
         response.andDo(print())
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().is4xxClientError());
     }
+
 }
