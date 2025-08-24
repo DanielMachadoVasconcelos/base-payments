@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Currency;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -38,7 +40,7 @@ class CancelOrderControllerTest extends SpringBootIntegrationTest {
                 .toAcceptTheAuthorizationWith(expectedCorrelationId);
 
         // given: a valid place order request
-        var request = new PlaceOrderRequest("USD", 100L);
+        var request = new PlaceOrderRequest(Currency.getInstance("USD"), 100L);
 
         // and: the place order request is made
         var orderPlacedResponse = mockMvc.perform(post("/orders")

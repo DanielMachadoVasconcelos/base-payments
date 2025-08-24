@@ -1,10 +1,12 @@
 package com.ead.payments.orders.place;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.Currency;
+
 public record PlaceOrderRequest(
-        @NotBlank String currency,
-        @NotNull Long amount
+        @NotNull Currency currency,
+        @NotNull @Min(0L) Long amount
 ) {
 }
