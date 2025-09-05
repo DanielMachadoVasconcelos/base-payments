@@ -1,158 +1,121 @@
-version: "3.8"
+  version: "3.8"
 
-services:
-  postgres:
-    container_name: postgres
-    image: postgres:latest
-    networks:
-      - integration-test
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: orders
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-    ports:
-      - '5432:5432'
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d orders"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  services:
+    postgres:
+      container_name: postgres
+      image: postgres:latest
+      networks:
+        - integration-test
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      environment:
+        POSTGRES_DB: orders
+        POSTGRES_USER: user
+        POSTGRES_PASSWORD: password
+      ports:
+        - '5432:5432'
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U user -d orders"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
 
-  pgadmin:
-    container_name: pgadmin4
-    image: dpage/pgadmin4
-    restart: always
-    networks:
-      - integration-test
-    volumes:
-      - pgadmin4_data:/var/lib/pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "5050:80"
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -qO - http://localhost:80/misc/ping || exit 1" ]
-      interval: 30s
-      timeout: 10s
-      start_period: 120s
-      retries: 3
+    pgadmin:
+      container_name: pgadmin4
+      image: dpage/pgadmin4
+      restart: always
+      networks:
+        - integration-test
+      volumes:
+        - pgadmin4_data:/var/lib/pgadmin
+      environment:
+        PGADMIN_DEFAULT_EMAIL: admin@admin.com
+        PGADMIN_DEFAULT_PASSWORD: admin
+      ports:
+        - "5050:80"
+      healthcheck:
+        test: [ "CMD-SHELL", "wget -qO - http://localhost:80/misc/ping || exit 1" ]
+        interval: 30s
+        timeout: 10s
+        start_period: 120s
+        retries: 3
 
-  kafka:
-    image: bitnami/kafka:latest
-    container_name: kafka
-    networks:
-      - integration-test
-    environment:
-      KAFKA_CFG_KRAFT_MODE: controller
-      KAFKA_CFG_NODE_ID: 1
-      KAFKA_CFG_PROCESS_ROLES: broker,controller
-      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
-      KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      ALLOW_PLAINTEXT_LISTENER: "yes"
-    ports:
-      - "9092:9092"
-    volumes:
-      - kafka_data:/bitnami/kafka
-    healthcheck:
-      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1"]
-      interval: 20s
-      timeout: 10s
-      retries: 10
+    kafka:
+      image: bitnami/kafka:latest
+      container_name: kafka
+      networks:
+        - integration-test
+      environment:
+        KAFKA_CFG_KRAFT_MODE: controller
+        KAFKA_CFG_NODE_ID: 1
+        KAFKA_CFG_PROCESS_ROLES: broker,controller
+        KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+        KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+        KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+        KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+        KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+        KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        ALLOW_PLAINTEXT_LISTENER: "yes"
+      ports:
+        - "9092:9092"
+      volumes:
+        - kafka_data:/bitnami/kafka
+      healthcheck:
+        test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list || exit 1"]
+        interval: 20s
+        timeout: 10s
+        retries: 10
 
-  akhq:
-    image: tchiotludo/akhq:latest
-    container_name: akhq
-    networks:
-      - integration-test
-    environment:
-      AKHQ_CONFIGURATION: |
-        akhq:
-          connections:
-            kafka-local:
-              properties:
-                bootstrap.servers: "kafka:9092"
-    ports:
-      - "8080:8080"
-    depends_on:
-      kafka:
-        condition: service_healthy
+    akhq:
+      image: tchiotludo/akhq:latest
+      container_name: akhq
+      networks:
+        - integration-test
+      environment:
+        AKHQ_CONFIGURATION: |
+          akhq:
+            connections:
+              kafka-local:
+                properties:
+                  bootstrap.servers: "kafka:9092"
+      ports:
+        - "8080:8080"
+      depends_on:
+        kafka:
+          condition: service_healthy
 
-  wiremock:
-    image: rodolpheche/wiremock:latest
-    container_name: issuer-wiremock
-    networks:
-      - integration-test
-    ports:
-      - "8081:8080"
-    volumes:
-      - ./wiremock:/home/wiremock
-    command: --global-response-templating --verbose
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/__admin || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    wiremock:
+      image: rodolpheche/wiremock:latest
+      container_name: issuer-wiremock
+      networks:
+        - integration-test
+      ports:
+        - "8081:8080"
+      volumes:
+        - ./wiremock:/home/wiremock
+      command: --global-response-templating --verbose
+      healthcheck:
+        test: ["CMD-SHELL", "curl -f http://localhost:8080/__admin || exit 1"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
 
-  postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:latest
-    container_name: postgres-exporter
-    networks:
-      - integration-test
-    environment:
-      - DATA_SOURCE_NAME=postgresql://user:password@postgres:5432/orders?sslmode=disable
-    expose:
-      - "9187"
-    depends_on:
-      postgres:
-        condition: service_healthy
+    zipkin:
+      container_name: zipkin
+      networks:
+        - integration-test
+      image: 'openzipkin/zipkin:latest'
+      volumes:
+        - zipkin_data:/data
+      ports:
+        - '9411:9411'
 
-  prometheus:
-    image: 'prom/prometheus:v2.14.0'
-    container_name: prometheus
-    networks:
-      - integration-test
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    ports:
-      - '9191:9090'
-    command: '--config.file=/etc/prometheus/config.yml'
-    volumes:
-      - './prometheus.yml:/etc/prometheus/config.yml'
-      - prometheus_data:/prometheus
+  volumes:
+    kafka_data:
+    postgres_data:
+    pgadmin4_data:
+    zipkin_data:
 
-  grafana:
-    container_name: grafana
-    image: 'grafana/grafana:10.4.7'
-    networks:
-      - integration-test
-    depends_on:
-      prometheus:
-        condition: service_started
-    ports:
-      - '3000:3000'
-    environment:
-      GF_INSTALL_PLUGINS: ""
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
-
-volumes:
-  kafka_data:
-  postgres_data:
-  pgadmin4_data:
-  prometheus_data:
-  grafana_data:
-
-networks:
-  integration-test:
-    driver: bridge
+  networks:
+    integration-test:
+      driver: bridge

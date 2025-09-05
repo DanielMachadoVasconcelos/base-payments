@@ -1,6 +1,8 @@
 package com.ead.payments.orders.place;
 
 import com.google.common.base.Preconditions;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.observation.annotation.Observed;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,12 @@ public class IssuerService {
 
     private final IssuerGateway issuerGateway;
 
+    @Observed(
+        name = "issuer.authorize",
+        contextualName = "issuer-service.authorize",
+        lowCardinalityKeyValues = {"service", "issuer", "operation", "authorize"}
+    )
+    @Timed(value = "issuer.authorize", histogram = true, extraTags = {"service", "issuer"}, percentiles = {0.5, 0.95, 0.99})
     public Authorization authorize(PlaceOrderCommand command) {
 
         IssuerAuthorizationRequest request = new IssuerAuthorizationRequest(
