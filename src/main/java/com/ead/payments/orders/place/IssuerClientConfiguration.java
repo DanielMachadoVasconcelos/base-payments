@@ -25,9 +25,9 @@ public class IssuerClientConfiguration {
     ) {
         return RestClient.builder()
                 .defaultRequest(request ->
-                        request.header("X-Correlation-ID", MDC.get("correlationId"))
-                                .header("X-Trace-ID", MDC.get("traceId"))
-                                .header("X-Mocked-Issuer", MDC.get("x-mocked-issuer"))
+                    request.header("X-Correlation-ID", MDC.get("correlationId"))
+                            .header("X-Trace-ID", MDC.get("traceId"))
+                            .header("X-Mocked-Issuer", MDC.get("x-mocked-issuer"))
                 )
                 .baseUrl(baseUrl)
                 .requestFactory(requestFactory)

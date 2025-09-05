@@ -3,7 +3,7 @@ plugins {
 	id 'idea'
 	id 'jacoco'
 
-	id 'org.springframework.boot' version '3.5.0'
+	id 'org.springframework.boot' version '3.5.5'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -73,11 +73,10 @@ dependencies {
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 
 	implementation 'io.micrometer:micrometer-core'
-	implementation 'io.micrometer:micrometer-observation'
-	implementation 'io.micrometer:micrometer-registry-prometheus'
 	implementation 'io.micrometer:micrometer-tracing'
 	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
-	testImplementation 'io.micrometer:micrometer-observation-test'
+
+    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
 
 	implementation 'org.wiremock.integrations:wiremock-spring-boot:3.6.0'
 
