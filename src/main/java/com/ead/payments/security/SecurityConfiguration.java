@@ -2,6 +2,7 @@ package com.ead.payments.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authorization.method.AuthorizationAdvisorProxyFactory;
 import org.springframework.security.config.Customizer;
@@ -15,6 +16,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -56,13 +58,25 @@ public class SecurityConfiguration {
                 .roles("ADMIN")
                 .build();
 
-        return new InMemoryUserDetailsManager(user, merchant, admin);
+        UserDetails grafana = User.withUsername("grafana")
+                .password(passwordEncoder.encode("password"))
+                .roles("ADMIN")
+                .build();
+
+        return new InMemoryUserDetailsManager(user, merchant, grafana, admin);
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
+
+    @Primary
+    @Bean @Profile({"local","integration-test"})
+    public PasswordEncoder noPasswordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+    }
+
 
     @Bean
     static Customizer<AuthorizationAdvisorProxyFactory> skipValueTypes() {
