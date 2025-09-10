@@ -30,7 +30,6 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(requests -> {
                     requests.requestMatchers("/").permitAll();
-                    requests.requestMatchers("/actuator/**").permitAll();
                     requests.anyRequest().authenticated();
                 })
                 .csrf(CsrfConfigurer::disable)
@@ -76,7 +75,6 @@ public class SecurityConfiguration {
     public PasswordEncoder noPasswordEncoder() {
         return NoOpPasswordEncoder.getInstance();
     }
-
 
     @Bean
     static Customizer<AuthorizationAdvisorProxyFactory> skipValueTypes() {
