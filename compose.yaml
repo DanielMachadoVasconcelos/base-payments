@@ -122,7 +122,7 @@
         - '9090:9090'
       command: '--config.file=/etc/prometheus/config.yml'
       volumes:
-        - './prometheus.yml:/etc/prometheus/config.yml'
+        - './grafana/prometheus/prometheus.yml:/etc/prometheus/config.yml'
         - prometheus_data:/prometheus
 
     tempo:
