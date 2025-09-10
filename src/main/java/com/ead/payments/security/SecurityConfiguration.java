@@ -2,7 +2,6 @@ package com.ead.payments.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authorization.method.AuthorizationAdvisorProxyFactory;
 import org.springframework.security.config.Customizer;
@@ -16,7 +15,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -30,6 +28,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(requests -> {
                     requests.requestMatchers("/").permitAll();
+                    requests.requestMatchers("/actuator/**").permitAll();
                     requests.anyRequest().authenticated();
                 })
                 .csrf(CsrfConfigurer::disable)
@@ -68,12 +67,6 @@ public class SecurityConfiguration {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-    @Primary
-    @Bean @Profile({"local","integration-test"})
-    public PasswordEncoder noPasswordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
     }
 
     @Bean
