@@ -1,4 +1,3 @@
-  version: "3.8"
 
   services:
     postgres:
@@ -14,6 +13,8 @@
         POSTGRES_PASSWORD: password
       ports:
         - '5432:5432'
+      # Allow more concurrent connections to support parallel test execution
+      command: ["postgres", "-c", "max_connections=200"]
       healthcheck:
         test: ["CMD-SHELL", "pg_isready -U user -d orders"]
         interval: 10s
@@ -110,11 +111,62 @@
       ports:
         - '9411:9411'
 
+    prometheus:
+      image: 'prom/prometheus:v2.14.0'
+      container_name: prometheus
+      networks:
+        - integration-test
+      extra_hosts:
+        - "host.docker.internal:host-gateway"
+      ports:
+        - '9090:9090'
+      command: '--config.file=/etc/prometheus/config.yml'
+      volumes:
+        - './prometheus.yml:/etc/prometheus/config.yml'
+        - prometheus_data:/prometheus
+
+    tempo:
+      image: grafana/tempo:2.8.2
+      container_name: tempo
+      networks:
+        - integration-test
+      # Note: The Tempo root path (http://localhost:3200/) returns 404 by design.
+      # Use http://localhost:3200/status or http://localhost:3200/ready to check service state.
+      # Browse traces via Grafana → Explore → Tempo.
+      ports:
+        - '3200:3200'   # Tempo HTTP API (query)
+      command: [ "-config.file=/etc/tempo.yaml" ]
+      volumes:
+        - ./grafana/tempo/tempo.yaml:/etc/tempo.yaml
+        - tempo_data:/var/tempo
+
+    grafana:
+      container_name: grafana
+      image: 'grafana/grafana:10.4.7'
+      networks:
+        - integration-test
+      depends_on:
+        prometheus:
+          condition: service_started
+      ports:
+        - '3000:3000'
+      environment:
+        GF_INSTALL_PLUGINS: ""
+        GF_SECURITY_ADMIN_USER: admin
+        GF_SECURITY_ADMIN_PASSWORD: admin
+      volumes:
+        - grafana_data:/var/lib/grafana
+        - ./grafana/provisioning:/etc/grafana/provisioning
+        - ./grafana/provisioning/dashboards:/var/lib/grafana/dashboards
+
   volumes:
     kafka_data:
     postgres_data:
     pgadmin4_data:
     zipkin_data:
+    prometheus_data:
+    grafana_data:
+    tempo_data:
 
   networks:
     integration-test:

@@ -5,13 +5,15 @@ global:
 scrape_configs:
   - job_name: 'spring-boot'
     metrics_path: '/actuator/prometheus'
+    basic_auth:
+      username: 'GRAFANA'
+      password: 'grafana'
     static_configs:
-      - targets: ['host.docker.internal:8080'] # If running on Linux without host.docker.internal, replace with your host IP
-
-  - job_name: 'postgres-exporter'
+      - targets: ['host.docker.internal:9098', 'host.docker.internal:9099'] # Update to match app instances behind gateway
+  - job_name: 'gateway'
+    metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['postgres-exporter:9187']
-
+      - targets: ['host.docker.internal:7070']
   - job_name: 'prometheus'
     static_configs:
       - targets: ['prometheus:9090']
