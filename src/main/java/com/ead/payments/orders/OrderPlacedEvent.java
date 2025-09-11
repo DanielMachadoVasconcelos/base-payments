@@ -1,11 +1,13 @@
 package com.ead.payments.orders;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 import lombok.Value;
 import org.springframework.modulith.events.Externalized;
+
+import java.util.Currency;
+import java.util.UUID;
 
 @Value
 @ToString
@@ -16,7 +18,7 @@ public class OrderPlacedEvent {
     UUID id;
     Long version;
     Order.OrderStatus status;
-    String currency;
+    Currency currency;
     Long amount;
 
 }

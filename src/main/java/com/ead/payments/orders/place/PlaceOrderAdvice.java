@@ -1,6 +1,7 @@
 package com.ead.payments.orders.place;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.net.URI;
 
@@ -43,5 +45,29 @@ public class PlaceOrderAdvice {
         return ResponseEntity
                 .status(401)
                 .body(problemDetails);
+    }
+
+    // capture the ConstraintViolationException and return a 400 status code
+    @ExceptionHandler
+    public ResponseEntity<ProblemDetail> handleInvalidConstraintViolationException(ConstraintViolationException e,
+                                                                                   HttpServletRequest request) {
+        log.error("Constraint violation exception", e);
+        ProblemDetail problemDetails = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problemDetails.setTitle("Constraint violation exception");
+        problemDetails.setDetail(e.getMessage());
+        problemDetails.setInstance(URI.create(request.getRequestURI()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetails);
+    }
+
+    // capture HandlerMethodValidationException (Spring 6+) and return a 400 status code with a ProblemDetail body
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ProblemDetail> handleHandlerMethodValidationException(HandlerMethodValidationException e,
+                                                                                HttpServletRequest request) {
+        log.error("Handler method validation failed", e);
+        ProblemDetail problemDetails = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problemDetails.setTitle("Constraint violation exception");
+        problemDetails.setDetail(e.getMessage());
+        problemDetails.setInstance(URI.create(request.getRequestURI()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetails);
     }
 }

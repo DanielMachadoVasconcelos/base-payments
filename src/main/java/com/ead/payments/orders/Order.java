@@ -1,12 +1,13 @@
 package com.ead.payments.orders;
 
+import java.util.Currency;
 import java.util.UUID;
 
 public record Order(
         UUID id,
         long version,
         OrderStatus status,
-        String currency,
+        Currency currency,
         Long amount
 ) {
 

@@ -7,11 +7,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @Slf4j
+@Validated
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/orders")

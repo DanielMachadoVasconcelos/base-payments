@@ -1,15 +1,17 @@
 package com.ead.payments.inventory;
 
-import static com.ead.payments.orders.Order.OrderStatus.PLACED;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import com.ead.payments.orders.OrderPlacedEvent;
-import java.time.Duration;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.modulith.test.ApplicationModuleTest;
 import org.springframework.modulith.test.Scenario;
+
+import java.time.Duration;
+import java.util.Currency;
+import java.util.UUID;
+
+import static com.ead.payments.orders.Order.OrderStatus.PLACED;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ApplicationModuleTest
 class InventoryControllerTest {
@@ -24,7 +26,7 @@ class InventoryControllerTest {
                 expectedOrderId,
                 0L,
                 PLACED,
-                "USD",
+                Currency.getInstance("USD"),
                 100L
         );
 
