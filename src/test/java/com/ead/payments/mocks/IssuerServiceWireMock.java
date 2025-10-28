@@ -4,6 +4,7 @@ package com.ead.payments.mocks;
 import com.ead.payments.logging.CorrelationId;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import jakarta.validation.constraints.NotNull;
 import org.junit.platform.commons.util.Preconditions;
 
@@ -17,7 +18,7 @@ public record IssuerServiceWireMock(WireMockServer mockIssuerService) implements
     }
 
     @Override
-    public boolean toAcceptTheAuthorizationWith(@NotNull CorrelationId expectedCorrelationId) {
+    public StubMapping toAcceptTheAuthorizationWith(@NotNull CorrelationId expectedCorrelationId) {
         // setup: the issuer service mock will return an authorized response
         var expectedResponse = aResponse()
                 .withStatus(201)
@@ -31,17 +32,15 @@ public record IssuerServiceWireMock(WireMockServer mockIssuerService) implements
                 );
 
         // setup: the issuer service mock will return an authorized response
-        mockIssuerService.stubFor(
+        return mockIssuerService.stubFor(
                 WireMock.post(urlEqualTo("/authorization"))
                         .withHeader("X-Correlation-ID", WireMock.equalTo(expectedCorrelationId.toString()))
                         .willReturn(expectedResponse)
         );
-
-        return true;
     }
 
     @Override
-    public boolean toRejectTheAuthorizationWith(@NotNull CorrelationId expectedCorrelationId) {
+    public StubMapping toRejectTheAuthorizationWith(@NotNull CorrelationId expectedCorrelationId) {
         // setup: the issuer service mock will return an authorized response
         var expectedResponse = aResponse()
                 .withStatus(200)
@@ -54,12 +53,10 @@ public record IssuerServiceWireMock(WireMockServer mockIssuerService) implements
                 );
 
         // setup: the issuer service mock will return an authorized response
-        mockIssuerService.stubFor(
+        return mockIssuerService.stubFor(
                 WireMock.post(urlEqualTo("/authorization"))
                         .withHeader("X-Correlation-ID", WireMock.equalTo(expectedCorrelationId.toString()))
                         .willReturn(expectedResponse)
         );
-
-        return true;
     }
 }

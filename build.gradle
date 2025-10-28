@@ -30,6 +30,7 @@ repositories {
 	mavenCentral()
 	maven { url 'https://repo.spring.io/milestone' }
 	maven { url 'https://repo.spring.io/snapshot' }
+	maven { url 'https://repo.spring.io/release' }
 }
 
 ext {
@@ -79,9 +80,11 @@ dependencies {
 
     implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
 
+	implementation 'com.github.loki4j:loki-logback-appender:1.5.2'
 	implementation 'org.wiremock.integrations:wiremock-spring-boot:3.10.6'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-docker-compose'
 	testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'

@@ -21,7 +21,6 @@ datasources:
         datasourceUid: prometheus
       serviceGraph:
         datasourceUid: prometheus
-<<<<<<< HEAD
   - name: Loki
     uid: loki
     type: loki
@@ -36,5 +35,3 @@ datasources:
           matcherRegex: "traceId=(\\w+)"
           datasourceUid: tempo
           url: "$${__value.raw}"
-=======
->>>>>>> 12ff661 (BS-0016-addedthe guidelines for junie)

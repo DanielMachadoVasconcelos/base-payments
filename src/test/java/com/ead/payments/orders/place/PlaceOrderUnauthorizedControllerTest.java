@@ -4,6 +4,7 @@ import com.ead.payments.SpringBootIntegrationTest;
 import com.ead.payments.logging.CorrelationId;
 import com.ead.payments.mocks.TestMocks;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +32,8 @@ public class PlaceOrderUnauthorizedControllerTest extends SpringBootIntegrationT
     void shouldNotAllowToPlaceTheOrderWhenTheIssuerDoNotAuthorizeThePayment() throws Exception {
         //setup: issuer service with an authorized response
         CorrelationId expectedCorrelationId = CorrelationId.random();
-        TestMocks.setup(issuerService())
-                 .toRejectTheAuthorizationWith(expectedCorrelationId);
+        StubMapping stubMapping = TestMocks.setup(issuerService())
+                .toRejectTheAuthorizationWith(expectedCorrelationId);
 
         // given: a valid place order request
         var request = new PlaceOrderRequest(Currency.getInstance("USD"), 100L);
