@@ -40,23 +40,25 @@ public class SecurityConfiguration {
 
     @Bean
     @Profile({"local", "integration-test"})
-    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+    public UserDetailsService userDetailsService() {
         UserDetails user = User.withUsername("customer")
-                .password(passwordEncoder.encode("password"))
+                .password("{noop}password")
                 .roles("CUSTOMER")
                 .build();
-
         UserDetails merchant = User.withUsername("merchant")
-                .password(passwordEncoder.encode("password"))
+                .password("{noop}password")
                 .roles("MERCHANT")
                 .build();
-
         UserDetails admin = User.withUsername("engineer")
-                .password(passwordEncoder.encode("password"))
+                .password("{noop}password")
                 .roles("ADMIN")
                 .build();
-
-        return new InMemoryUserDetailsManager(user, merchant, admin);
+        UserDetails grafana = User.withUsername("grafana")
+                .password("{noop}password")
+                .roles("ADMIN")
+                .build();
+                
+        return new InMemoryUserDetailsManager(user, merchant, grafana, admin);
     }
 
     @Bean
