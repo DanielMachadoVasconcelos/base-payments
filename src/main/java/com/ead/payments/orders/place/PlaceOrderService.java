@@ -3,6 +3,8 @@ package com.ead.payments.orders.place;
 import com.ead.payments.orders.Order;
 import com.ead.payments.orders.OrderAggregate;
 import com.ead.payments.orders.OrderRepository;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,16 @@ public class PlaceOrderService {
     final OrderRepository orderRepository;
     final IssuerService issuerService;
 
+    @Timed(value = "order-service.place-order",
+            histogram = true,
+            percentiles = {0.5, 0.95, 0.99},
+            extraTags = {"service", "order-service"}
+    )
+    @Observed(
+            name = "order-service.place-order",
+            contextualName = "place-order-service.handle",
+            lowCardinalityKeyValues = {"service", "order-service", "operation", "place-order"}
+    )
     public Order handle(PlaceOrderCommand command) {
 
         // authorize the order
