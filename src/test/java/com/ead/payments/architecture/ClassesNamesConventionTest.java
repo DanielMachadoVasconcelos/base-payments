@@ -1,11 +1,11 @@
 package com.ead.payments.architecture;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
-
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
+
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
 @AnalyzeClasses(packages = "com.ead.payments", importOptions = ImportOption.DoNotIncludeTests.class)
 class ClassesNamesConventionTest {
@@ -27,6 +27,7 @@ class ClassesNamesConventionTest {
                     .orShould().haveSimpleNameEndingWith("Product")
                     .orShould().haveSimpleNameEndingWith("Controller")
                     .orShould().haveSimpleNameEndingWith("Listener")
+                    .orShould().haveSimpleNameEndingWith("Decorator")
                     .orShould().haveSimpleNameEndingWith("Service")
                     .orShould().haveSimpleNameEndingWith("Repository")
                     .orShould().haveSimpleNameEndingWith("Configuration")
