@@ -7,7 +7,7 @@ services:
     networks:
       - integration-test
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     environment:
       POSTGRES_DB: orders
       POSTGRES_USER: user
