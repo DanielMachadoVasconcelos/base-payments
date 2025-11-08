@@ -67,6 +67,18 @@ jobs:
           args: up -d
         timeout-minutes: 15
 
+      - name: Wait for WireMock admin endpoint
+        uses: jakejarvis/wait-action@v1
+        with:
+          url: 'http://localhost:8081/__admin'
+          timeout: '300'   # seconds
+
+      - name: Wait for Postgres TCP port
+        uses: jakejarvis/wait-action@v1
+        with:
+          url: 'tcp://localhost:5432'
+          timeout: '120'
+
       - name: Run Tests
         uses: gradle/gradle-build-action@v2
         with:
