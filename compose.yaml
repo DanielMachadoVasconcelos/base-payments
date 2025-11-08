@@ -67,8 +67,8 @@ services:
       test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
       interval: 20s
       timeout: 10s
-      retries: 20
-      start_period: 60s
+      retries: 30
+      start_period: 120s
 
   akhq:
     image: tchiotludo/akhq:latest
@@ -102,8 +102,8 @@ services:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/__admin || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 30s
+      retries: 20
+      start_period: 60s
 
   prometheus:
     image: prom/prometheus:v2.14.0
