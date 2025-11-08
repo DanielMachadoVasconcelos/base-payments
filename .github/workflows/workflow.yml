@@ -61,67 +61,11 @@ jobs:
         run: docker compose --version
 
       - name: Start Docker Services
-        run: docker compose -f compose.yaml up -d
+        uses: docker/compose-action@v2
+        with:
+          files: compose.yaml
+          args: up -d
         timeout-minutes: 15
-
-      - name: Wait for services to be healthy
-        run: |
-          #!/usr/bin/env bash
-          set -eu
-          services=(postgres kafka issuer-wiremock)
-          timeout_seconds=420
-          end_time=$((SECONDS + timeout_seconds))
-          echo "Waiting up to ${timeout_seconds}s for services: ${services[*]}"
-
-          until [ $SECONDS -ge $end_time ]; do
-            all_ok=true
-            for s in "${services[@]}"; do
-              status=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}no-health{{end}}' "${s}" 2>/dev/null || echo "missing")
-              echo "$(date -u +%T) - ${s} health: ${status}"
-              if [ "${status}" != "healthy" ]; then
-                all_ok=false
-              fi
-            done
-
-            # extra check: kafka CLI should list topics (verifies broker fully responsive)
-            if $all_ok; then
-              if ! docker exec kafka /bin/sh -c "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list" >/dev/null 2>&1; then
-                echo "Kafka CLI not responding yet"
-                all_ok=false
-              fi
-            fi
-
-            # extra check for wiremock admin endpoint + mapping presence
-            if $all_ok; then
-              if ! curl -fsS http://localhost:8081/__admin >/dev/null 2>&1; then
-                echo "WireMock admin endpoint not responding yet"
-                all_ok=false
-              else
-                # ensure the authorization mapping is loaded
-                if ! curl -s http://localhost:8081/__admin/mappings | grep -q '"url"\s*:\s*"/authorization"'; then
-                  echo "WireMock mappings do not contain /authorization yet"
-                  all_ok=false
-                fi
-              fi
-            fi
-
-            if $all_ok; then
-              echo "All services healthy and ready"
-              exit 0
-            fi
-
-            sleep 5
-          done
-
-          echo "Timed out waiting for services to become healthy"
-          docker ps --format "table {{.Names}}\t{{.Status}}"
-          echo "===== issuer-wiremock last 400 lines ====="
-          docker logs issuer-wiremock --tail 400 || true
-          echo "===== kafka last 400 lines ====="
-          docker logs kafka --tail 400 || true
-          echo "===== kafka topics (diagnostic) ====="
-          docker exec kafka /bin/sh -c "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list" || true
-          exit 1
 
       - name: Run Tests
         uses: gradle/gradle-build-action@v2
@@ -136,7 +80,10 @@ jobs:
 
       - name: Stop Docker Services
         if: always()
-        run: docker compose -f compose.yaml down -v
+        uses: docker/compose-action@v2
+        with:
+          files: compose.yaml
+          args: down -v
         timeout-minutes: 5
 
   deploy:
