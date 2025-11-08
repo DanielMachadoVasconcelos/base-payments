@@ -2,28 +2,25 @@ package com.ead.payments.orders.cancel;
 
 import com.ead.payments.orders.Order;
 import com.ead.payments.orders.OrderAggregate;
+import com.ead.payments.orders.OrderAggregateMapper;
 import com.ead.payments.orders.OrderRepository;
-import java.util.Optional;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CancelOrderService {
 
-    OrderRepository orderRepository;
+    final OrderAggregateMapper orderAggregateMapper;
+    final OrderRepository orderRepository;
 
     public Optional<Order> handle(UUID orderId) {
         return orderRepository.findById(orderId)
                 .map(OrderAggregate::cancel)
                 .map(orderRepository::save)
-                .map(aggregate -> new Order(
-                        aggregate.getId(),
-                        aggregate.getVersion(),
-                        aggregate.getStatus(),
-                        aggregate.getCurrency(),
-                        aggregate.getAmount()
-                ));
+                .map(orderAggregateMapper::toOrder);
     }
 }

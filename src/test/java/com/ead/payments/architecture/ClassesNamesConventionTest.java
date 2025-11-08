@@ -36,6 +36,7 @@ class ClassesNamesConventionTest {
                     .orShould().haveSimpleNameEndingWith("Event")
                     .orShould().haveSimpleNameEndingWith("Command")
                     .orShould().haveSimpleNameEndingWith("Mapper")
+                    .orShould().haveSimpleNameEndingWith("MapperImpl")
                     .orShould().haveSimpleNameEndingWith("Request")
                     .orShould().haveSimpleNameEndingWith("Response")
                     .orShould().haveSimpleNameEndingWith("Client")
