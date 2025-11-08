@@ -19,7 +19,8 @@ services:
       test: ["CMD-SHELL", "pg_isready -U user -d orders"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
 
   pgadmin:
     container_name: pgadmin4
@@ -66,8 +67,8 @@ services:
       test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
       interval: 20s
       timeout: 10s
-      retries: 10
-      start_period: 20s
+      retries: 20
+      start_period: 60s
 
   akhq:
     image: tchiotludo/akhq:latest
@@ -101,7 +102,8 @@ services:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/__admin || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
 
   prometheus:
     image: prom/prometheus:v2.14.0
