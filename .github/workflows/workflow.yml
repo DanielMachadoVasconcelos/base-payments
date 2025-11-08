@@ -65,13 +65,13 @@ jobs:
         timeout-minutes: 15
 
       - name: Wait for WireMock admin endpoint
-        uses: jakejarvis/wait-action@v1
+        uses: jakejarvis/wait-action@v2.1.3
         with:
           url: 'http://localhost:8081/__admin'
           timeout: '300'   # seconds
 
       - name: Wait for Postgres TCP port
-        uses: jakejarvis/wait-action@v1
+        uses: jakejarvis/wait-action@v2.1.3
         with:
           url: 'tcp://localhost:5432'
           timeout: '120'
