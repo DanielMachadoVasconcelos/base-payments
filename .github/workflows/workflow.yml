@@ -57,56 +57,16 @@ jobs:
           java-version: '24'
           distribution: 'temurin'
 
-      - name: Check Docker Compose Version
-        run: docker compose --version
-
-      - name: Start Docker Services
-        run: docker compose -f compose.yaml up -d
-        timeout-minutes: 15
-
-      - name: Wait for WireMock admin endpoint
-        run: |
-          echo "Waiting for WireMock to be ready..."
-          for i in {1..60}; do
-            if curl -sf http://localhost:8081/__admin > /dev/null; then
-              echo "WireMock is ready!"
-              exit 0
-            fi
-            echo "Attempt $i: WireMock not ready yet, waiting..."
-            sleep 5
-          done
-          echo "Timeout waiting for WireMock"
-          exit 1
-
-      - name: Wait for Postgres TCP port
-        run: |
-          echo "Waiting for Postgres to be ready..."
-          for i in {1..24}; do
-            if nc -z localhost 5432; then
-              echo "Postgres is ready!"
-              exit 0
-            fi
-            echo "Attempt $i: Postgres not ready yet, waiting..."
-            sleep 5
-          done
-          echo "Timeout waiting for Postgres"
-          exit 1
-
       - name: Run Tests
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: test -Djava.compiler.args="--enable-preview" --parallel -Dspring.docker.compose.skip.in-tests=true
+          arguments: test -Djava.compiler.args="--enable-preview" --parallel
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           files: '**/build/test-results/test/*.xml'
-
-      - name: Stop Docker Services
-        if: always()
-        run: docker compose -f compose.yaml down -v
-        timeout-minutes: 5
 
   deploy:
     needs: test
