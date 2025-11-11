@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.Currency;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -100,7 +102,7 @@ public class ActuatorControllerTest extends SpringBootIntegrationTest {
                 .toAcceptTheAuthorizationWith(correlationId);
 
         // given: trigger the metric by placing an order
-        var request = new PlaceOrderRequest("USD", 100L);
+        var request = new PlaceOrderRequest(Currency.getInstance("USD"), 100L);
         mockMvc.perform(
                         post("/orders")
                                 .header("version", "1.0.0")

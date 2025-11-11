@@ -2,6 +2,7 @@ package com.ead.payments.orders.place;
 
 import com.ead.payments.orders.Order;
 import com.ead.payments.orders.OrderAggregate;
+import com.ead.payments.orders.OrderAggregateMapper;
 import com.ead.payments.orders.OrderRepository;
 import io.micrometer.core.annotation.Timed;
 import io.micrometer.observation.annotation.Observed;
@@ -15,6 +16,7 @@ import static com.ead.payments.orders.place.IssuerService.RejectedAuthorization;
 @RequiredArgsConstructor
 public class PlaceOrderService {
 
+    final OrderAggregateMapper orderAggregateMapper;
     final OrderRepository orderRepository;
     final IssuerService issuerService;
 
@@ -34,8 +36,8 @@ public class PlaceOrderService {
         Authorization authorization = issuerService.authorize(command);
 
         // if the authorization is rejected, throw an exception
-        if (authorization instanceof RejectedAuthorization rejected) {
-            throw new IssuerDeclinedException("Authorization was rejected with status: " + rejected.status() + " and state reason: " + rejected.statusReason());
+        if (authorization instanceof RejectedAuthorization(String status, String statusReason)) {
+            throw new IssuerDeclinedException("Authorization was rejected with status: " + status + " and state reason: " + statusReason);
         }
 
         // create a new OrderAggregate object with the command object
@@ -44,13 +46,6 @@ public class PlaceOrderService {
         // save the order object in the repository
         aggregate = orderRepository.save(aggregate);
 
-        // return the order object
-        return new Order(
-            aggregate.getId(),
-            aggregate.getVersion(),
-            aggregate.getStatus(),
-            aggregate.getCurrency(),
-            aggregate.getAmount()
-        );
+        return orderAggregateMapper.toOrder(aggregate);
     }
 }

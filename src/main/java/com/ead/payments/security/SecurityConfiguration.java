@@ -45,18 +45,19 @@ public class SecurityConfiguration {
                 .password(passwordEncoder.encode("password"))
                 .roles("CUSTOMER")
                 .build();
-
         UserDetails merchant = User.withUsername("merchant")
                 .password(passwordEncoder.encode("password"))
                 .roles("MERCHANT")
                 .build();
-
         UserDetails admin = User.withUsername("engineer")
                 .password(passwordEncoder.encode("password"))
                 .roles("ADMIN")
                 .build();
-
-        return new InMemoryUserDetailsManager(user, merchant, admin);
+        UserDetails grafana = User.withUsername("grafana")
+                .password(passwordEncoder.encode("password"))
+                .roles("ADMIN")
+                .build();
+        return new InMemoryUserDetailsManager(user, merchant, grafana, admin);
     }
 
     @Bean

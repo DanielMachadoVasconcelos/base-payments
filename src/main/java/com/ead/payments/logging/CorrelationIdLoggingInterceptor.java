@@ -48,6 +48,7 @@ public class CorrelationIdLoggingInterceptor extends OncePerRequestFilter {
 
         } finally {
             MDC.remove(CORRELATION_ID_KEY);
+            MDC.remove(TRACE_ID_KEY);
         }
     }
 }

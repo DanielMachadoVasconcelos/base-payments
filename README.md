@@ -20,6 +20,11 @@ This project contains a Docker Compose file named `compose.yaml`. In this file, 
 * **PostgreSQL**: [`postgres:latest`](https://hub.docker.com/_/postgres)
 * **Kafka**: [`bitnami/kafka:latest`](https://hub.docker.com/r/bitnami/kafka/)
 * **AKHQ** (Kafka GUI): [`tchiotludo/akhq:latest`](https://hub.docker.com/r/tchiotludo/akhq)
+* **Tempo** (Distributed tracing backend)
+* **Tempo** (Distributed tracing backend with Zipkin-compatible ingest exposed on `localhost:9412`)
+* **Prometheus** (Metrics)
+* **Grafana** (Dashboards)
+* **Loki + Promtail** (Centralised log aggregation and forwarding to Grafana)
 
 > Note: Please review the tags of the used images and set them to the same versions as those running in production to ensure consistency.
 
@@ -50,6 +55,19 @@ To run the application, you can use the following command:
 ```
 
 This command will start the application on port `8080` by default.
+
+When the Docker Compose observability stack is running, the service automatically forwards structured logs to Loki via the `com.github.loki4j:loki-logback-appender`. The default push URL is `http://localhost:3100/loki/api/v1/push`; override it as needed:
+
+```bash
+LOKI_URL=http://localhost:3100/loki/api/v1/push ./gradlew bootRun
+```
+
+With Grafana, Loki, Tempo running you can:
+
+- Explore metrics via the `HTTP Requests Monitoring` dashboard.
+- Monitor end-to-end service health with the imported `Spring Boot Observability` dashboard (Grafana ID `17175`), provisioned automatically under `Dashboards → Spring Boot Observability`.
+- View correlated logs in Grafana Explore (`Loki` datasource) – log lines embed both `correlationId` and `traceId`.
+- Jump from a log line to a trace (derived field on `traceId`) or search recent traces via the Tempo datasource (spans are exported to Tempo through its Zipkin-compatible endpoint exposed on `localhost:9412`).
 
 ## Testing the Application
 
