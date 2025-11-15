@@ -1,4 +1,4 @@
-package com.ead.payments.orders.place;
+package com.ead.payments.orders.place.response;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,7 +12,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlaceOrderResponse {
+public class PlaceOrderResponseV1 {
 
     private UUID id;
     private @NotBlank Currency currency;
