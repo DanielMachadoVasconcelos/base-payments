@@ -1,5 +1,6 @@
 package com.ead.payments.orders.search;
 
+import com.ead.payments.orders.search.mapping.SearchOrderResponseMapper;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
@@ -21,16 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class SearchOrderController {
 
     SearchOrderService searchOrderService;
+    SearchOrderResponseMapper responseMapper;
 
     @GetMapping(path = "/{order_id}", headers = "version=1.0.0")
     @ResponseStatus(HttpStatus.OK)
     public Optional<SearchOrderResponse> searchOrder(@PathVariable("order_id") @NotNull UUID orderId) {
         return searchOrderService.search(orderId)
-                .map(order -> new SearchOrderResponse(
-                        order.id(),
-                        order.version(),
-                        order.currency(),
-                        order.amount()
-                ));
+                .map(responseMapper::from);
     }
 }

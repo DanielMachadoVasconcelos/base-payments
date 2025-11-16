@@ -7,6 +7,7 @@ import lombok.Value;
 import org.springframework.modulith.events.Externalized;
 
 import java.util.Currency;
+import java.util.List;
 import java.util.UUID;
 
 @Value
@@ -20,5 +21,6 @@ public class OrderPlacedEvent {
     Order.OrderStatus status;
     Currency currency;
     Long amount;
+    List<LineItem> lineItems;  // NEW
 
 }

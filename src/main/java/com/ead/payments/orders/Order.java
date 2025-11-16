@@ -1,6 +1,7 @@
 package com.ead.payments.orders;
 
 import java.util.Currency;
+import java.util.List;
 import java.util.UUID;
 
 public record Order(
@@ -8,7 +9,8 @@ public record Order(
         long version,
         OrderStatus status,
         Currency currency,
-        Long amount
+        Long amount,
+        List<LineItem> lineItems  // NEW
 ) {
 
     public enum OrderStatus {

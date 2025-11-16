@@ -1,7 +1,7 @@
-package com.ead.payments.orders.search;
+package com.ead.payments.orders.place.response;
 
 import com.ead.payments.orders.response.LineItemResponse;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,11 +14,11 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SearchOrderResponse {
+public class PlaceOrderResponseV2 {
 
-    private @NotNull UUID id;
-    private @NotNull @Min(0L) Long version;
-    private @NotNull Currency currency;
+    private UUID id;
+    private @NotBlank Currency currency;
     private @NotNull Long amount;
     private @NotNull List<LineItemResponse> lineItems;
+
 }

@@ -1,5 +1,7 @@
 package com.ead.payments.orders.place;
 
+import com.ead.payments.orders.place.request.PlaceOrderRequestV1;
+
 import com.ead.payments.SpringBootIntegrationTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class PlaceInvalidOrderControllerTet extends SpringBootIntegrationTest {
+public class PlaceInvalidOrderControllerTest extends SpringBootIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -29,7 +31,7 @@ public class PlaceInvalidOrderControllerTet extends SpringBootIntegrationTest {
     public void shouldNotAllowToPlaceTheOrderWhenTheOrderIsInvalid() throws Exception {
 
         // given: an invalid place order request
-        PlaceOrderRequest placeOrderRequest = new PlaceOrderRequest(
+        PlaceOrderRequestV1 placeOrderRequest = new PlaceOrderRequestV1(
                 Currency.getInstance("USD"),
                 -1200L
         );

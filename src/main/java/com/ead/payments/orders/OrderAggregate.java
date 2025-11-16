@@ -16,7 +16,9 @@ import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.authorization.method.AuthorizeReturnObject;
 
+import java.util.ArrayList;
 import java.util.Currency;
+import java.util.List;
 import java.util.UUID;
 
 import static com.ead.payments.orders.Order.OrderStatus;
@@ -50,23 +52,59 @@ public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate> implem
     @NotNull
     private Long amount;
 
-    public OrderAggregate(PlaceOrderCommand command) {
-        Preconditions.checkNotNull(command.currency(), "The currency is required");
-        Preconditions.checkNotNull(command.amount(), "The amount is required");
-        Preconditions.checkArgument(command.amount() > 0, "The amount must be greater than 0");
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderLineItemEntity> lineItems = new ArrayList<>();
 
+    public OrderAggregate(PlaceOrderCommand command) {
+        // Existing validations
+        Preconditions.checkNotNull(command.currency(), "The currency is required");
+        Preconditions.checkNotNull(command.lineItems(), "Line items are required");
+        // Note: Line items can be empty for V1 orders
+        
+        // Validate each line item
+        for (LineItem item : command.lineItems()) {
+            Preconditions.checkArgument(item.quantity() > 0, 
+                "Line item quantity must be greater than 0");
+            Preconditions.checkArgument(item.unitPrice() != null && item.unitPrice() >= 0, 
+                "Line item unit price must be non-negative");
+        }
+        
+        // Convert LineItems to entities
+        this.lineItems = command.lineItems().stream()
+            .map(item -> new OrderLineItemEntity(this, item))
+            .toList();
+        
+        // Compute total from line items (if any)
+        Long computedTotal = lineItems.stream()
+            .mapToLong(OrderLineItemEntity::getLineTotal)
+            .sum();
+        
+        // Validate that computed total matches the provided amount (if provided)
+        if (command.amount() != null && !command.lineItems().isEmpty()) {
+            Preconditions.checkArgument(
+                computedTotal.equals(command.amount()),
+                "Line items total (%s) does not match provided amount (%s)",
+                computedTotal,
+                command.amount()
+            );
+        }
+        
+        // For V1 orders (empty line items), use the provided amount
+        // For V2 orders, use computed total from line items
+        this.amount = command.amount() != null ? command.amount() : computedTotal;
+        Preconditions.checkArgument(this.amount > 0, "The amount must be greater than 0");
+        
         this.id = command.id();
-        //this.version = 0L;
         this.status = OrderStatus.PLACED;
         this.currency = command.currency();
-        this.amount = command.amount();
-
+        
         registerEvent(new OrderPlacedEvent(
-                command.id(),
-                version,
-                status,
-                command.currency(),
-                command.amount()
+            command.id(),
+            version,
+            status,
+            command.currency(),
+            this.amount,
+            command.lineItems()  // Include line items in event
         ));
     }
 

@@ -3,7 +3,7 @@ package com.ead.payments.observability;
 import com.ead.payments.SpringBootIntegrationTest;
 import com.ead.payments.logging.CorrelationId;
 import com.ead.payments.mocks.TestMocks;
-import com.ead.payments.orders.place.PlaceOrderRequest;
+import com.ead.payments.orders.place.request.PlaceOrderRequestV1;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
@@ -102,7 +102,7 @@ public class ActuatorControllerTest extends SpringBootIntegrationTest {
                 .toAcceptTheAuthorizationWith(correlationId);
 
         // given: trigger the metric by placing an order
-        var request = new PlaceOrderRequest(Currency.getInstance("USD"), 100L);
+        var request = new PlaceOrderRequestV1(Currency.getInstance("USD"), 100L);
         mockMvc.perform(
                         post("/orders")
                                 .header("version", "1.0.0")
@@ -121,4 +121,3 @@ public class ActuatorControllerTest extends SpringBootIntegrationTest {
                 .andExpect(jsonPath("$.measurements", is(notNullValue())));
     }
 }
-

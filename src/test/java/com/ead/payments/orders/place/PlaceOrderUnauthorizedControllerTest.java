@@ -1,5 +1,7 @@
 package com.ead.payments.orders.place;
 
+import com.ead.payments.orders.place.request.PlaceOrderRequestV1;
+
 import com.ead.payments.SpringBootIntegrationTest;
 import com.ead.payments.logging.CorrelationId;
 import com.ead.payments.mocks.TestMocks;
@@ -36,7 +38,7 @@ public class PlaceOrderUnauthorizedControllerTest extends SpringBootIntegrationT
                 .toRejectTheAuthorizationWith(expectedCorrelationId);
 
         // given: a valid place order request
-        var request = new PlaceOrderRequest(Currency.getInstance("USD"), 100L);
+        var request = new PlaceOrderRequestV1(Currency.getInstance("USD"), 100L);
 
         // when: the place order request is made
         var response = mockMvc.perform(post("/orders")

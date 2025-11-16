@@ -8,6 +8,7 @@ import org.springframework.modulith.test.Scenario;
 
 import java.time.Duration;
 import java.util.Currency;
+import java.util.List;
 import java.util.UUID;
 
 import static com.ead.payments.orders.Order.OrderStatus.PLACED;
@@ -27,7 +28,8 @@ class InventoryControllerTest {
                 0L,
                 PLACED,
                 Currency.getInstance("USD"),
-                100L
+                100L,
+                List.of()  // Empty line items for test
         );
 
         // When
