@@ -19,3 +19,4 @@ public class PlaceOrderResponseV1 {
     private @NotNull Long amount;
 
 }
+

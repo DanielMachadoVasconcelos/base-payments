@@ -15,3 +15,4 @@ CREATE INDEX IF NOT EXISTS idx_line_items_order_id ON orders.line_items(order_id
 
 -- Note: orders.amount remains for query efficiency (denormalized)
 -- Consistency ensured via application logic
+
