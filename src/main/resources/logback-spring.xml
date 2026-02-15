@@ -39,13 +39,12 @@
     <logger name="org.apache.juli.logging.DirectJDKLog" level="ERROR"/>
     <logger name="org.springframework.jdbc.core.JdbcTemplate" level="INFO"/>
 
-    <springProfile name="local">
+    <springProfile name="integration-test">
         <root level="INFO">
             <appender-ref ref="Console"/>
-            <appender-ref ref="Loki"/>
         </root>
     </springProfile>
-    <springProfile name="!local">
+    <springProfile name="!integration-test">
         <root level="INFO">
             <appender-ref ref="Console"/>
             <appender-ref ref="Loki"/>
