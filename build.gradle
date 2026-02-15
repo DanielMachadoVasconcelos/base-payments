@@ -3,7 +3,7 @@ plugins {
 	id 'idea'
 	id 'jacoco'
 
-	id 'org.springframework.boot' version '3.5.5'
+	id 'org.springframework.boot' version '4.0.2'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -16,7 +16,7 @@ tasks.withType(JavaCompile) {
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(24)
+		languageVersion = JavaLanguageVersion.of(25)
 	}
 }
 
@@ -34,27 +34,29 @@ repositories {
 }
 
 ext {
-	set('springModulithVersion', "1.4.0")
-	set('springCloudVersion', "2025.0.0")
+	set('springModulithVersion', "2.0.2")
+	set('springCloudVersion', "2025.1.1")
 }
 
 dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	implementation 'org.springframework.boot:spring-boot-starter-aspectj'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.kafka:spring-kafka'
+	implementation 'org.springframework.boot:spring-boot-starter-kafka'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-zipkin'
+	implementation 'org.springframework.retry:spring-retry'
 
 	implementation 'org.springframework.modulith:spring-modulith-events-kafka'
 	implementation 'org.springframework.modulith:spring-modulith-events-api'
 	implementation 'org.springframework.modulith:spring-modulith-starter-core'
 	implementation 'org.springframework.modulith:spring-modulith-starter-jpa'
 
-	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.springframework.boot:spring-boot-starter-flyway'
 	implementation 'org.flywaydb:flyway-database-postgresql'
 
 	compileOnly 'org.projectlombok:lombok'
@@ -63,7 +65,7 @@ dependencies {
 
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
-	implementation 'org.springdoc:springdoc-openapi-ui:1.8.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1'
 
 	runtimeOnly 'org.postgresql:postgresql'
 
@@ -75,20 +77,16 @@ dependencies {
 
 	implementation 'io.micrometer:micrometer-core'
 	implementation 'io.micrometer:micrometer-registry-prometheus'
-	implementation 'io.micrometer:micrometer-tracing'
 	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
 
-    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-
 	implementation 'com.github.loki4j:loki-logback-appender:1.5.2'
-	implementation 'org.wiremock.integrations:wiremock-spring-boot:3.10.6'
 
+	testImplementation 'org.wiremock.integrations:wiremock-spring-boot:4.1.0'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testImplementation 'org.springframework.boot:spring-boot-docker-compose'
 	testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
 
 	testImplementation 'com.tngtech.archunit:archunit-junit5:1.4.1'
 	testImplementation 'com.tngtech.archunit:archunit-junit5-api:1.4.1'
