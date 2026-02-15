@@ -9,13 +9,13 @@ import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.slf4j.MDC;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 @RequiredArgsConstructor
-@ActiveProfiles({"test", "local"})
+@Profile({"test", "local"})
 public class MockedStubsLoggingInterceptor extends OncePerRequestFilter {
 
     @Override
