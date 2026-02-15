@@ -39,6 +39,7 @@ class ClassesNamesConventionTest {
                     .orShould().haveSimpleNameEndingWith("MapperImpl")
                     .orShould().haveSimpleNameEndingWith("Request")
                     .orShould().haveSimpleNameEndingWith("Response")
+                    .orShould().haveNameMatching(".*\\.\\w+ResponseV\\d+")
                     .orShould().haveSimpleNameEndingWith("Client")
                     .orShould().haveSimpleNameEndingWith("Gateway")
                     .orShould().haveSimpleNameEndingWith("Properties")

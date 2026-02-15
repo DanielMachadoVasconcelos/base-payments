@@ -1,6 +1,5 @@
 package com.ead.payments.orders.events;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,15 +16,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderEventResponse {
-    @JsonProperty("id")
     private UUID id;
 
-    @JsonProperty("createdAt")
     private Instant createdAt;
 
-    @JsonProperty("eventType")
     private String eventType;
 
-    @JsonProperty("eventData")
     private String eventData;
 }

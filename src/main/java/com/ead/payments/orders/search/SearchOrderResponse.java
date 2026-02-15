@@ -1,5 +1,6 @@
 package com.ead.payments.orders.search;
 
+import com.ead.payments.orders.response.LineItemResponse;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Currency;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -18,4 +20,5 @@ public class SearchOrderResponse {
     private @NotNull @Min(0L) Long version;
     private @NotNull Currency currency;
     private @NotNull Long amount;
+    private @NotNull List<LineItemResponse> lineItems;
 }

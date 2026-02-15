@@ -3,8 +3,8 @@ package com.ead.payments.orders.cancel;
 import com.ead.payments.SpringBootIntegrationTest;
 import com.ead.payments.logging.CorrelationId;
 import com.ead.payments.mocks.TestMocks;
-import com.ead.payments.orders.place.PlaceOrderRequest;
-import com.ead.payments.orders.place.PlaceOrderResponse;
+import com.ead.payments.orders.place.request.PlaceOrderRequestV1;
+import com.ead.payments.orders.place.response.PlaceOrderResponseV1;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ class CancelOrderControllerTest extends SpringBootIntegrationTest {
                 .toAcceptTheAuthorizationWith(expectedCorrelationId);
 
         // given: a valid place order request
-        var request = new PlaceOrderRequest(Currency.getInstance("USD"), 100L);
+        var request = new PlaceOrderRequestV1(Currency.getInstance("USD"), 100L);
 
         // and: the place order request is made
         var orderPlacedResponse = mockMvc.perform(post("/orders")
@@ -52,7 +52,7 @@ class CancelOrderControllerTest extends SpringBootIntegrationTest {
 
         // and: the order id is extracted from the response
         var orderId = objectMapper.readValue(orderPlacedResponse.andReturn().getResponse().getContentAsString(),
-                PlaceOrderResponse.class).getId();
+                PlaceOrderResponseV1.class).getId();
 
         // when: the cancel order request is made
         var response = mockMvc.perform(post("/orders/" + orderId + "/cancel")
