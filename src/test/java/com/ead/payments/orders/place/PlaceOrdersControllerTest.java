@@ -1,12 +1,11 @@
 package com.ead.payments.orders.place;
 
-import com.ead.payments.orders.place.request.LineItemRequest;
-import com.ead.payments.orders.place.request.PlaceOrderRequestV1;
-import com.ead.payments.orders.place.request.PlaceOrderRequestV2;
-
 import com.ead.payments.SpringBootIntegrationTest;
 import com.ead.payments.logging.CorrelationId;
 import com.ead.payments.mocks.TestMocks;
+import com.ead.payments.orders.place.request.LineItemRequest;
+import com.ead.payments.orders.place.request.PlaceOrderRequestV1;
+import com.ead.payments.orders.place.request.PlaceOrderRequestV2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -95,16 +94,16 @@ class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
                         jsonPath("$.id", is(notNullValue())),
                         jsonPath("$.currency", is("USD")),
                         jsonPath("$.amount", is(4000)),
-                        jsonPath("$.lineItems", is(notNullValue())),
-                        jsonPath("$.lineItems.length()", is(2)),
-                        jsonPath("$.lineItems[0].name", is("Wireless Bluetooth Headphones")),
-                        jsonPath("$.lineItems[0].quantity", is(2)),
-                        jsonPath("$.lineItems[0].unitPrice", is(1000)),
-                        jsonPath("$.lineItems[0].reference", is("SKU-HEADPHONE-001")),
-                        jsonPath("$.lineItems[1].name", is("USB-C Charging Cable")),
-                        jsonPath("$.lineItems[1].quantity", is(1)),
-                        jsonPath("$.lineItems[1].unitPrice", is(2000)),
-                        jsonPath("$.lineItems[1].reference", is("SKU-CABLE-002"))
+                        jsonPath("$.line_items", is(notNullValue())),
+                        jsonPath("$.line_items.length()", is(2)),
+                        jsonPath("$.line_items[0].name", is("Wireless Bluetooth Headphones")),
+                        jsonPath("$.line_items[0].quantity", is(2)),
+                        jsonPath("$.line_items[0].unit_price", is(1000)),
+                        jsonPath("$.line_items[0].reference", is("SKU-HEADPHONE-001")),
+                        jsonPath("$.line_items[1].name", is("USB-C Charging Cable")),
+                        jsonPath("$.line_items[1].quantity", is(1)),
+                        jsonPath("$.line_items[1].unit_price", is(2000)),
+                        jsonPath("$.line_items[1].reference", is("SKU-CABLE-002"))
                 );
     }
 }

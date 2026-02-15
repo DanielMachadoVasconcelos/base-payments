@@ -73,8 +73,8 @@ class EventsControllerTest extends SpringBootIntegrationTest {
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", is(notNullValue())))
-                .andExpect(jsonPath("$[0].eventType", is(notNullValue())))
-                .andExpect(jsonPath("$[0].eventData", is(notNullValue())));
+                .andExpect(jsonPath("$[0].event_type", is(notNullValue())))
+                .andExpect(jsonPath("$[0].event_data", is(notNullValue())));
     }
 
     @Test
@@ -116,7 +116,7 @@ class EventsControllerTest extends SpringBootIntegrationTest {
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(eventId)))
-                .andExpect(jsonPath("$.eventType", is(notNullValue())))
-                .andExpect(jsonPath("$.eventData", is(notNullValue())));
+                .andExpect(jsonPath("$.event_type", is(notNullValue())))
+                .andExpect(jsonPath("$.event_data", is(notNullValue())));
     }
 }
