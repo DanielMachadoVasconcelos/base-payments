@@ -6,13 +6,13 @@ import com.ead.payments.mocks.TestMocks;
 import com.ead.payments.orders.place.request.LineItemRequest;
 import com.ead.payments.orders.place.request.PlaceOrderRequestV1;
 import com.ead.payments.orders.place.request.PlaceOrderRequestV2;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Currency;
 import java.util.List;
