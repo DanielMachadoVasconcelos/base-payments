@@ -1,3 +1,6 @@
+-- Ensure extension functions created in orders/public are resolvable
+SET search_path TO orders, public;
+
 -- Create line_items table
 CREATE TABLE IF NOT EXISTS orders.line_items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -15,4 +18,3 @@ CREATE INDEX IF NOT EXISTS idx_line_items_order_id ON orders.line_items(order_id
 
 -- Note: orders.amount remains for query efficiency (denormalized)
 -- Consistency ensured via application logic
-
