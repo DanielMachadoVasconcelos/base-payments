@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   postgres:
     container_name: postgres
@@ -94,7 +92,7 @@ services:
     networks:
       - integration-test
     ports:
-      - '8081:8080'
+      - '18081:8080'
     volumes:
       - ./wiremock:/home/wiremock
     command: --global-response-templating --verbose
@@ -105,86 +103,21 @@ services:
       retries: 20
       start_period: 60s
 
-  prometheus:
-    image: prom/prometheus:v2.14.0
-    container_name: prometheus
+  observability:
+    # Single local LGTM stack with native OTLP ingest for logs, metrics and traces.
+    image: grafana/otel-lgtm:0.24.0
+    container_name: observability
     networks:
       - integration-test
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
-    ports:
-      - '9090:9090'
-    command: '--config.file=/etc/prometheus/config.yml'
-    volumes:
-      - ./grafana/prometheus/prometheus.yml:/etc/prometheus/config.yml
-      - prometheus_data:/prometheus
-
-  tempo:
-    image: grafana/tempo:2.8.2
-    container_name: tempo
-    networks:
-      - integration-test
-    ports:
-      - '3200:3200'
-      - '9412:9411'
-    command: ['-config.file=/etc/tempo.yaml']
-    volumes:
-      - ./grafana/tempo/tempo.yaml:/etc/tempo.yaml
-      - tempo_data:/var/tempo
-
-  loki:
-    image: grafana/loki:2.9.8
-    container_name: loki
-    networks:
-      - integration-test
-    command: ['-config.file=/etc/loki/local-config.yaml']
-    ports:
-      - '3100:3100'
-    volumes:
-      - ./grafana/loki/loki-config.yaml:/etc/loki/local-config.yaml
-      - loki_data:/loki
-
-  promtail:
-    image: grafana/promtail:2.9.8
-    container_name: promtail
-    networks:
-      - integration-test
-    depends_on:
-      - loki
-    command: ['-config.file=/etc/promtail/config.yaml']
-    volumes:
-      - ./grafana/loki/promtail-config.yaml:/etc/promtail/config.yaml
-      - /var/log:/var/log
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-
-  grafana:
-    image: grafana/grafana:10.4.7
-    container_name: grafana
-    networks:
-      - integration-test
-    depends_on:
-      prometheus:
-        condition: service_started
     ports:
       - '3000:3000'
-    environment:
-      GF_INSTALL_PLUGINS: ''
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
-      - ./grafana/provisioning/dashboards:/var/lib/grafana/dashboards
+      - '4317:4317'
+      - '4318:4318'
 
 volumes:
   kafka_data:
   postgres_data:
   pgadmin4_data:
-  prometheus_data:
-  grafana_data:
-  tempo_data:
-  loki_data:
 
 networks:
   integration-test:

@@ -1,0 +1,148 @@
+spring:
+  application:
+    name: base-payments
+  devtools:
+    add-properties: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/orders
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: base-payments-hikari
+      maximum-pool-size: 50
+      minimum-idle: 20
+      auto-commit: true
+      idle-timeout: 600000
+      connection-timeout: 30000
+      max-lifetime: 1800000
+      validation-timeout: 5000
+  profiles:
+    active: local
+  sql:
+    init:
+      platform: postgresql
+      schema: orders
+  flyway:
+    baseline-on-migrate: true
+    default-schema: orders
+    schemas: orders
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: ${spring.application.name}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    listener:
+      missing-topics-fatal: false
+  security:
+    enabled: true
+  jpa:
+    show-sql: false
+    format-sql: false
+    properties:
+      org.hibernate.envers.default_schema: orders
+      hibernate.default_schema: orders
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  threads:
+    virtual:
+      enabled: true
+  docker:
+    compose:
+      lifecycle-management: start_only
+  modulith:
+    republish-outstanding-events: true
+    events:
+      republish-outstanding-events-on-restart: true
+      jdbc:
+        schema-initialization-enabled: true
+        schema: orders
+        table: events
+        snapshot-table: snapshots
+        snapshot-schema: orders
+        snapshot-events: 1000
+        snapshot-interval: 1000
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui-html
+
+logging:
+  level:
+    org.hibernate.SQL: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+
+management:
+  # Keep the existing application tag on every metric while also sharing it with traces.
+  observations:
+    annotations:
+      enabled: true
+    key-values:
+      application: base-payments-service
+  metrics:
+    tags:
+      application: base-payments-service
+    distribution:
+      percentiles-histogram:
+        "http.server.requests": true
+        "issuer.authorize": true
+      percentiles:
+        "issuer.authorize": 0.5,0.9,0.95,0.99
+  endpoints:
+    jmx:
+      exposure:
+        include: "*"
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+  # Micrometer metrics still use the dedicated OTLP registry, even with the Boot OTel starter.
+  otlp:
+    metrics:
+      export:
+        url: http://localhost:4318/v1/metrics
+        step: 30s
+  # Spring Boot 4 exports traces and logs through the OpenTelemetry SDK.
+  opentelemetry:
+    resource-attributes:
+      service.name: ${spring.application.name}
+      service.namespace: com.ead.payments
+      deployment.environment.name: ${spring.profiles.active:local}
+    tracing:
+      export:
+        otlp:
+          endpoint: http://localhost:4318/v1/traces
+          transport: HTTP
+    logging:
+      export:
+        otlp:
+          endpoint: http://localhost:4318/v1/logs
+          transport: HTTP
+
+issuer:
+  client:
+    base-url: http://localhost:18081
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: false
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10

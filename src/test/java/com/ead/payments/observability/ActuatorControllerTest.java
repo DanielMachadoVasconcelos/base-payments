@@ -5,7 +5,6 @@ import com.ead.payments.logging.CorrelationId;
 import com.ead.payments.mocks.TestMocks;
 import com.ead.payments.orders.place.request.PlaceOrderRequestV1;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Currency;
 
@@ -74,21 +72,6 @@ public class ActuatorControllerTest extends SpringBootIntegrationTest {
         response
                 .andExpect(status().isOk())
                 .andDo(print());
-    }
-
-    @Test
-    @WithMockUser(username = "engineer", roles = "ADMIN")
-    @DisplayName("Should expose the actuator prometheus endpoint when application is running")
-    void shouldExposeTheActuatorPrometheusEndpointWhenApplicationIsRunning() throws Exception {
-        // given the actuator endpoint is invoked
-        ResultActions response = mockMvc.perform(get("/actuator/prometheus"));
-
-        // then the response is successful and returns text/plain in Prometheus format
-        response
-                .andExpect(status().isOk())
-                .andDo(print())
-                .andExpect(MockMvcResultMatchers.header().string("Content-Type", Matchers.containsString("text/plain")))
-                .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("jvm_info")));
     }
 
     @Test
