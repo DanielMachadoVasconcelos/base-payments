@@ -1,13 +1,8 @@
 {
+  "priority": 10,
   "request": {
     "method": "POST",
-    "url": "/authorization",
-    "headers": {
-      "X-Mocked-Issuer": {
-        "equalTo": "approved",
-        "caseInsensitive": true
-      }
-    }
+    "url": "/authorization"
   },
   "response": {
     "status": 201,

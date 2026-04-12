@@ -87,7 +87,8 @@ services:
         condition: service_healthy
 
   wiremock:
-    image: rodolpheche/wiremock:latest
+    # Official WireMock image with native arm64 support for Apple Silicon.
+    image: wiremock/wiremock:3.13.2-2
     container_name: issuer-wiremock
     networks:
       - integration-test
@@ -95,13 +96,7 @@ services:
       - '18081:8080'
     volumes:
       - ./wiremock:/home/wiremock
-    command: --global-response-templating --verbose
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/__admin || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 20
-      start_period: 60s
+    entrypoint: ["/docker-entrypoint.sh", "--global-response-templating", "--verbose"]
 
   observability:
     # Single local LGTM stack with native OTLP ingest for logs, metrics and traces.
@@ -109,6 +104,10 @@ services:
     container_name: observability
     networks:
       - integration-test
+    volumes:
+      # Provision custom dashboards automatically on every local startup.
+      - ./grafana/provisioning/dashboards/base-payments-provider.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/base-payments-provider.yaml:ro
+      - ./grafana/provisioning/dashboards/base-payments:/var/lib/grafana/dashboards/base-payments:ro
     ports:
       - '3000:3000'
       - '4317:4317'

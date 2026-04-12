@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
@@ -24,11 +25,16 @@ public class IssuerClientConfiguration {
                                     @Value("${issuer.client.base-url}") String baseUrl
     ) {
         return RestClient.builder()
-                .defaultRequest(request ->
+                .defaultRequest(request -> {
                     request.header("X-Correlation-ID", MDC.get("correlationId"))
-                            .header("X-Trace-ID", MDC.get("traceId"))
-                            .header("X-Mocked-Issuer", MDC.get("x-mocked-issuer"))
-                )
+                            .header("X-Trace-ID", MDC.get("traceId"));
+
+                    // Only forward the mock selector when the incoming request explicitly set it.
+                    String mockedIssuer = MDC.get("x-mocked-issuer");
+                    if (StringUtils.hasText(mockedIssuer)) {
+                        request.header("X-Mocked-Issuer", mockedIssuer);
+                    }
+                })
                 .baseUrl(baseUrl)
                 .requestFactory(requestFactory)
                 .defaultHeader("Content-Type", "application/json")

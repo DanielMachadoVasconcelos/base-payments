@@ -1,5 +1,6 @@
 package com.ead.payments.orders.events;
 
+import com.ead.payments.logging.OrderIdLoggingContext;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -32,25 +33,27 @@ public class EventsController {
     @GetMapping(path = "/{order_id}/events", headers = "version=1.0.0")
     @ResponseStatus(HttpStatus.OK)
     public List<OrderEventResponse> getOrderEvents(@PathVariable("order_id") @NotNull UUID orderId) {
-        log.info("Retrieving events for order: {}", orderId);
+        try (OrderIdLoggingContext.Scope ignored = OrderIdLoggingContext.withOrderId(orderId)) {
+            log.info("Retrieving events for order: {}", orderId);
 
-        // Try to get events from the service
-        List<OrderEventResponse> events = orderEventService.findAllByOrderId(orderId);
-        log.info("Found {} events from service", events.size());
+            // Try to get events from the service
+            List<OrderEventResponse> events = orderEventService.findAllByOrderId(orderId);
+            log.info("Found {} events from service", events.size());
 
-        // If no events found, return a hardcoded response for testing
-        if (events.isEmpty()) {
-            log.info("Returning hardcoded event for testing");
-            UUID eventId = UUID.randomUUID();
-            return List.of(new OrderEventResponse(
-                    eventId,
-                    java.time.Instant.now(),
-                    "OrderPlacedEvent",
-                    "{\"orderId\":\"" + orderId + "\",\"status\":\"PLACED\"}"
-            ));
+            // If no events found, return a hardcoded response for testing
+            if (events.isEmpty()) {
+                log.info("Returning hardcoded event for testing");
+                UUID eventId = UUID.randomUUID();
+                return List.of(new OrderEventResponse(
+                        eventId,
+                        java.time.Instant.now(),
+                        "OrderPlacedEvent",
+                        "{\"orderId\":\"" + orderId + "\",\"status\":\"PLACED\"}"
+                ));
+            }
+
+            return events;
         }
-
-        return events;
     }
 
     /**
@@ -65,22 +68,24 @@ public class EventsController {
     public Optional<OrderEventResponse> getOrderEvent(
             @PathVariable("order_id") @NotNull UUID orderId,
             @PathVariable("event_id") @NotNull UUID eventId) {
-        log.info("Retrieving event {} for order: {}", eventId, orderId);
+        try (OrderIdLoggingContext.Scope ignored = OrderIdLoggingContext.withOrderId(orderId)) {
+            log.info("Retrieving event {} for order: {}", eventId, orderId);
 
-        // Try to get the event from the service
-        Optional<OrderEventResponse> event = orderEventService.findByOrderIdAndEventId(orderId, eventId);
+            // Try to get the event from the service
+            Optional<OrderEventResponse> event = orderEventService.findByOrderIdAndEventId(orderId, eventId);
 
-        // If no event found, return a hardcoded response for testing
-        if (event.isEmpty()) {
-            log.info("Returning hardcoded event for testing");
-            return Optional.of(new OrderEventResponse(
-                    eventId,
-                    java.time.Instant.now(),
-                    "OrderPlacedEvent",
-                    "{\"orderId\":\"" + orderId + "\",\"status\":\"PLACED\"}"
-            ));
+            // If no event found, return a hardcoded response for testing
+            if (event.isEmpty()) {
+                log.info("Returning hardcoded event for testing");
+                return Optional.of(new OrderEventResponse(
+                        eventId,
+                        java.time.Instant.now(),
+                        "OrderPlacedEvent",
+                        "{\"orderId\":\"" + orderId + "\",\"status\":\"PLACED\"}"
+                ));
+            }
+
+            return event;
         }
-
-        return event;
     }
 }

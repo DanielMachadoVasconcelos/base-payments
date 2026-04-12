@@ -2,7 +2,7 @@
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                %magenta(%d{HH:mm:ss.SSSXXX}) %highlight(%-5level) [correlationId=%X{correlationId:-}] [traceId=%X{traceId:-}] --- %cyan([%15.15t]) %yellow(%logger{39}) : %msg %mdc%n%throwable
+                %magenta(%d{HH:mm:ss.SSSXXX}) %highlight(%-5level) [correlationId=%X{correlationId:-}] [traceId=%X{traceId:-}] [order_id=%X{order_id:-}] --- %cyan([%15.15t]) %yellow(%logger{39}) : %msg %mdc%n%throwable
             </pattern>
         </encoder>
     </appender>
@@ -19,7 +19,7 @@
     <springProfile name="!integration-test">
         <appender name="OpenTelemetry" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
             <!-- trace/span ids come from the active context; capture the custom MDC keys explicitly -->
-            <captureMdcAttributes>correlationId,x-mocked-issuer</captureMdcAttributes>
+            <captureMdcAttributes>correlationId,order_id,x-mocked-issuer</captureMdcAttributes>
             <captureCodeAttributes>true</captureCodeAttributes>
         </appender>
         <root level="INFO">

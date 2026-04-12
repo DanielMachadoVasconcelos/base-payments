@@ -1,0 +1,13 @@
+apiVersion: 1
+
+providers:
+  - name: 'Base Payments'
+    orgId: 1
+    folder: 'Base Payments'
+    type: file
+    disableDeletion: false
+    allowUiUpdates: true
+    updateIntervalSeconds: 10
+    options:
+      path: /var/lib/grafana/dashboards/base-payments
+      foldersFromFilesStructure: false

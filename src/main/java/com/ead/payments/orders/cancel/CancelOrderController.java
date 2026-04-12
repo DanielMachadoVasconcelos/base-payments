@@ -1,5 +1,6 @@
 package com.ead.payments.orders.cancel;
 
+import com.ead.payments.logging.OrderIdLoggingContext;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
@@ -25,13 +26,15 @@ public class CancelOrderController {
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(path = "/{order_id}/cancel", headers = "version=1.0.0")
     public Optional<CancelOrderResponse> cancelOrder(@PathVariable( "order_id") @NotNull UUID orderId) {
-        return cancelOrderService.handle(orderId)
-                .map(order -> new CancelOrderResponse(
-                        order.id(),
-                        order.version(),
-                        order.status(),
-                        order.currency(),
-                        order.amount()
-                ));
+        try (OrderIdLoggingContext.Scope ignored = OrderIdLoggingContext.withOrderId(orderId)) {
+            return cancelOrderService.handle(orderId)
+                    .map(order -> new CancelOrderResponse(
+                            order.id(),
+                            order.version(),
+                            order.status(),
+                            order.currency(),
+                            order.amount()
+                    ));
+        }
     }
 }
