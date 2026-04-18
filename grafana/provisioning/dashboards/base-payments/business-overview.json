@@ -1,0 +1,385 @@
+{
+  "__inputs": [],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "12.4.2"
+    },
+    {
+      "type": "panel",
+      "id": "bargauge",
+      "name": "Bar gauge",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "round(sum(increase(http_server_requests_milliseconds_count{job=\"com.ead.payments/base-payments\", method=\"POST\", uri=\"/orders\", status=\"201\"}[$__range])))",
+          "instant": true,
+          "legendFormat": "Created",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Orders Created",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 5, "w": 4, "x": 4, "y": 0 },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "round(sum(increase(http_server_requests_milliseconds_count{job=\"com.ead.payments/base-payments\", method=\"GET\", uri=\"/orders/{order_id}\", status=\"200\"}[$__range])))",
+          "instant": true,
+          "legendFormat": "Read",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Orders Read",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 5, "w": 4, "x": 8, "y": 0 },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "round(sum(increase(http_server_requests_milliseconds_count{job=\"com.ead.payments/base-payments\", method=\"POST\", uri=\"/orders/{order_id}/cancel\", status=\"200\"}[$__range])))",
+          "instant": true,
+          "legendFormat": "Cancelled",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Orders Cancelled",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 20 },
+              { "color": "red", "value": 40 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 12, "y": 0 },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "100 * sum(increase(http_server_requests_milliseconds_count{job=\"com.ead.payments/base-payments\", method=\"POST\", uri=\"/orders/{order_id}/cancel\", status=\"200\"}[$__range])) / clamp_min(sum(increase(http_server_requests_milliseconds_count{job=\"com.ead.payments/base-payments\", method=\"POST\", uri=\"/orders\", status=\"201\"}[$__range])), 1)",
+          "instant": true,
+          "legendFormat": "Cancel ratio",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Cancellation Ratio",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 5, "w": 8, "x": 16, "y": 0 },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name"
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "round(sum(increase(issuer_authorize_milliseconds_count{job=\"com.ead.payments/base-payments\"}[$__range])))",
+          "instant": true,
+          "legendFormat": "Authorizations",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Issuer Authorizations",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "ops" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 5 },
+      "id": 6,
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(rate(http_server_requests_milliseconds_count{job=\"com.ead.payments/base-payments\", method=\"POST\", uri=\"/orders\", status=\"201\"}[$__rate_interval]))",
+          "legendFormat": "Created",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(rate(http_server_requests_milliseconds_count{job=\"com.ead.payments/base-payments\", method=\"GET\", uri=\"/orders/{order_id}\", status=\"200\"}[$__rate_interval]))",
+          "legendFormat": "Read",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(rate(http_server_requests_milliseconds_count{job=\"com.ead.payments/base-payments\", method=\"POST\", uri=\"/orders/{order_id}/cancel\", status=\"200\"}[$__rate_interval]))",
+          "legendFormat": "Cancelled",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Order Actions per Second",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "ms" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 5 },
+      "id": 7,
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_requests_milliseconds_bucket{job=\"com.ead.payments/base-payments\", method=\"POST\", uri=\"/orders\"}[$__rate_interval])))",
+          "legendFormat": "Create p95",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_requests_milliseconds_bucket{job=\"com.ead.payments/base-payments\", method=\"GET\", uri=\"/orders/{order_id}\"}[$__rate_interval])))",
+          "legendFormat": "Read p95",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_requests_milliseconds_bucket{job=\"com.ead.payments/base-payments\", method=\"POST\", uri=\"/orders/{order_id}/cancel\"}[$__rate_interval])))",
+          "legendFormat": "Cancel p95",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Business Endpoint Latency (p95)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "ms" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 13 },
+      "id": 8,
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(order_service_place_order_milliseconds_bucket{job=\"com.ead.payments/base-payments\"}[$__rate_interval])))",
+          "legendFormat": "Place order service p95",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(issuer_authorize_milliseconds_bucket{job=\"com.ead.payments/base-payments\"}[$__rate_interval])))",
+          "legendFormat": "Issuer authorize p95",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(issuer_gateway_milliseconds_bucket{job=\"com.ead.payments/base-payments\"}[$__rate_interval])))",
+          "legendFormat": "Issuer gateway p95",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Internal Flow Latency (p95)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 13 },
+      "id": 9,
+      "options": {
+        "displayMode": "basic",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showUnfilled": true
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "round(sum by (currency) (increase(order_service_place_order_milliseconds_count{job=\"com.ead.payments/base-payments\"}[$__range])))",
+          "legendFormat": "{{currency}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Orders by Currency",
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 21 },
+      "id": 10,
+      "options": {
+        "displayMode": "basic",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showUnfilled": true
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "round(sum by (currency) (increase(issuer_authorize_milliseconds_count{job=\"com.ead.payments/base-payments\"}[$__range])))",
+          "legendFormat": "{{currency}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Authorizations by Currency",
+      "type": "bargauge"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["base-payments", "business", "prometheus"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timezone": "",
+  "title": "Base Payments - Business Overview",
+  "uid": "base-payments-business",
+  "version": 1,
+  "weekStart": ""
+}

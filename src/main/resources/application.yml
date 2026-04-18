@@ -1,0 +1,276 @@
+# -----------------------------------------------------------------------------
+# This file is the main runtime configuration for the service.
+#
+# Plain-English guide:
+# - "spring" contains the application and infrastructure settings.
+# - "management" controls health checks, metrics, traces, and logs.
+# - "issuer" points to the mock external payment issuer used locally.
+# - "eureka" configures service discovery for environments that use it.
+# -----------------------------------------------------------------------------
+
+spring:
+  application:
+    # The internal name of this service.
+    # Spring uses it in logs, service registration, and OpenTelemetry traces.
+    name: base-payments
+
+  devtools:
+    # Extra conveniences for local development, such as better restart behavior.
+    # This does not change business logic.
+    add-properties: true
+
+  profiles:
+    # The default runtime profile for a developer machine.
+    # In this project, "local" means "run against local Docker services".
+    active: local
+
+  datasource:
+    # Main PostgreSQL database connection.
+    # This is where orders, events, and supporting records are stored.
+    url: jdbc:postgresql://localhost:5432/orders
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+    hikari:
+      # HikariCP is the connection pool.
+      # Think of it as a managed bucket of ready-to-use database connections.
+      pool-name: base-payments-hikari
+
+      # Maximum and minimum number of open database connections to keep available.
+      maximum-pool-size: 50
+      minimum-idle: 20
+
+      # Local behavior and timeout settings for the pool.
+      auto-commit: true
+      idle-timeout: 600000
+      connection-timeout: 30000
+      max-lifetime: 1800000
+      validation-timeout: 5000
+
+  sql:
+    init:
+      # Tells Spring which database flavor it is working with when SQL resources run.
+      platform: postgresql
+      schema: orders
+
+  flyway:
+    # Flyway keeps the database structure aligned with the codebase.
+    # On startup, it checks which schema changes have already been applied and
+    # runs any missing migrations.
+    baseline-on-migrate: true
+    default-schema: orders
+    schemas: orders
+
+  kafka:
+    # Kafka is the event backbone used by this project.
+    # The service publishes and consumes business events through this broker.
+    bootstrap-servers: localhost:9092
+
+    consumer:
+      # Consumer group name used when reading Kafka messages.
+      # Reusing the application name keeps ownership simple in local runs.
+      group-id: ${spring.application.name}
+
+      # "earliest" means a fresh local consumer can read messages from the
+      # beginning of a topic instead of only new ones.
+      auto-offset-reset: earliest
+
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+
+      properties:
+        # The real payloads are JSON, and Spring should deserialize them safely.
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: "*"
+
+    producer:
+      # Outgoing Kafka messages are sent with string keys and JSON payloads.
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    listener:
+      # Local startup should not fail just because a topic has not been created yet.
+      missing-topics-fatal: false
+
+  security:
+    # Keeps the Spring Security filter chain active.
+    # This project expects authentication and authorization behavior to be enabled.
+    enabled: true
+
+  jpa:
+    # Hibernate / JPA controls how Java objects map to database tables.
+    # SQL logging is disabled here to keep local logs readable.
+    show-sql: false
+    format-sql: false
+
+    properties:
+      # Default schema used by Hibernate and Envers auditing tables.
+      org.hibernate.envers.default_schema: orders
+      hibernate.default_schema: orders
+
+  jackson:
+    # API JSON uses snake_case naming, for example "thumbnail_url".
+    property-naming-strategy: SNAKE_CASE
+
+  threads:
+    virtual:
+      # Enables Java virtual threads.
+      # In simple terms, this lets the app handle blocking work more efficiently.
+      enabled: true
+
+  docker:
+    compose:
+      # Spring can detect and start Docker Compose services for local development.
+      # "start_only" means it starts dependencies but does not try to stop them later.
+      lifecycle-management: start_only
+
+  modulith:
+    # Spring Modulith manages domain events inside the application.
+    # If an event could not be fully delivered before shutdown, these options help
+    # retry and recover it on the next startup.
+    republish-outstanding-events: true
+
+    events:
+      republish-outstanding-events-on-restart: true
+
+      jdbc:
+        # Store Modulith events in the database so they survive restarts.
+        schema-initialization-enabled: true
+        schema: orders
+        table: events
+
+        # Snapshot settings reduce the amount of event history that must be replayed.
+        snapshot-table: snapshots
+        snapshot-schema: orders
+        snapshot-events: 1000
+        snapshot-interval: 1000
+
+springdoc:
+  swagger-ui:
+    # Friendly URL for interactive API documentation in local development.
+    path: /swagger-ui-html
+
+logging:
+  level:
+    # Keep noisy SQL internals out of normal logs so business flow is easier to follow.
+    org.hibernate.SQL: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+
+management:
+  # ---------------------------------------------------------------------------
+  # Actuator + Observability
+  #
+  # This section controls:
+  # - health endpoints
+  # - application metrics
+  # - distributed traces
+  # - log export
+  #
+  # In this project, all three telemetry types are exported with OTLP so the
+  # local Grafana LGTM stack can display them together.
+  # ---------------------------------------------------------------------------
+
+  observations:
+    annotations:
+      # Enables annotation-driven observability such as @Observed,
+      # @ObservationKeyValue, and @ObservationKeyValues.
+      enabled: true
+
+    key-values:
+      # A shared label automatically attached to observations.
+      # This helps group data in dashboards and searches.
+      application: base-payments-service
+
+  metrics:
+    tags:
+      # Adds the same application label to metrics specifically.
+      application: base-payments-service
+
+    distribution:
+      percentiles-histogram:
+        # Histograms allow latency charts and percentile calculations.
+        "http.server.requests": true
+        "issuer.authorize": true
+
+      percentiles:
+        # Precompute the most useful latency percentiles for authorization calls.
+        "issuer.authorize": 0.5,0.9,0.95,0.99
+
+  endpoints:
+    jmx:
+      exposure:
+        # Expose all Actuator endpoints over JMX.
+        include: "*"
+
+    web:
+      exposure:
+        # Expose all Actuator endpoints over HTTP for local diagnostics.
+        include: "*"
+
+  endpoint:
+    health:
+      # Show detailed health information instead of only UP/DOWN.
+      show-details: always
+
+  tracing:
+    sampling:
+      # Capture 100% of traces locally.
+      # This is useful for development because nothing is hidden by sampling.
+      probability: 1.0
+
+  otlp:
+    metrics:
+      export:
+        # Metrics are pushed to the OTLP HTTP endpoint exposed by the local
+        # observability stack started through Docker Compose.
+        url: http://localhost:4318/v1/metrics
+
+        # Send metrics every 30 seconds.
+        step: 30s
+
+  opentelemetry:
+    resource-attributes:
+      # These identify the service in trace, metric, and log backends.
+      service.name: ${spring.application.name}
+      service.namespace: com.ead.payments
+      deployment.environment.name: ${spring.profiles.active:local}
+
+    tracing:
+      export:
+        otlp:
+          # Trace data goes to the OTLP HTTP trace endpoint.
+          endpoint: http://localhost:4318/v1/traces
+          transport: HTTP
+
+    logging:
+      export:
+        otlp:
+          # Log records go to the OTLP HTTP log endpoint so logs can be
+          # correlated with traces and metrics in Grafana.
+          endpoint: http://localhost:4318/v1/logs
+          transport: HTTP
+
+issuer:
+  client:
+    # Local URL for the mock payment issuer used during development and tests.
+    # In this project, the service calls this endpoint when authorizing a payment.
+    base-url: http://localhost:18081
+
+eureka:
+  client:
+    # Eureka is the service registry used in environments where services discover
+    # each other dynamically.
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+    # Register this service in Eureka and also read the registry from it.
+    register-with-eureka: true
+    fetch-registry: true
+
+  instance:
+    # Instance heartbeat settings tell Eureka how often this service reports
+    # that it is alive and how quickly it should be considered gone.
+    prefer-ip-address: false
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10

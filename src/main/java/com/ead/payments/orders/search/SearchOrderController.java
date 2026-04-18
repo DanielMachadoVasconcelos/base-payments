@@ -1,5 +1,6 @@
 package com.ead.payments.orders.search;
 
+import com.ead.payments.logging.OrderIdLoggingContext;
 import com.ead.payments.orders.search.mapping.SearchOrderResponseMapper;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.constraints.NotNull;
@@ -27,7 +28,9 @@ public class SearchOrderController {
     @GetMapping(path = "/{order_id}", headers = "version=1.0.0")
     @ResponseStatus(HttpStatus.OK)
     public Optional<SearchOrderResponse> searchOrder(@PathVariable("order_id") @NotNull UUID orderId) {
-        return searchOrderService.search(orderId)
-                .map(responseMapper::from);
+        try (OrderIdLoggingContext.Scope ignored = OrderIdLoggingContext.withOrderId(orderId)) {
+            return searchOrderService.search(orderId)
+                    .map(responseMapper::from);
+        }
     }
 }

@@ -6,6 +6,7 @@ import com.ead.payments.orders.place.request.PlaceOrderRequestV1;
 import com.ead.payments.orders.place.request.PlaceOrderRequestV2;
 import com.ead.payments.orders.place.response.PlaceOrderResponseV1;
 import com.ead.payments.orders.place.response.PlaceOrderResponseV2;
+import com.ead.payments.logging.OrderIdLoggingContext;
 import io.micrometer.observation.annotation.Observed;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
@@ -43,12 +44,13 @@ public class PlaceOrderController {
     )
     public PlaceOrderResponseV1 placeOrder(
             @RequestBody @Valid @NotNull PlaceOrderRequestV1 request) {
-        
+
         UUID orderId = UUID.randomUUID();
-        var command = commandMapper.toCommand(request, orderId);
-        var order = placeOrderService.handle(command);
-        
-        return responseMapper.toResponseV1(order);
+        try (OrderIdLoggingContext.Scope ignored = OrderIdLoggingContext.withOrderId(orderId)) {
+            var command = commandMapper.toCommand(request, orderId);
+            var order = placeOrderService.handle(command);
+            return responseMapper.toResponseV1(order);
+        }
     }
     
     /**
@@ -65,12 +67,13 @@ public class PlaceOrderController {
     )
     public PlaceOrderResponseV2 placeOrder(
             @RequestBody @Valid @NotNull PlaceOrderRequestV2 request) {
-        
+
         UUID orderId = UUID.randomUUID();
-        // MapStruct automatically uses LineItemMapper (from 'uses' parameter) to convert lineItems
-        var command = commandMapper.toCommand(request, orderId);
-        var order = placeOrderService.handle(command);
-        
-        return responseMapper.toResponseV2(order);
+        try (OrderIdLoggingContext.Scope ignored = OrderIdLoggingContext.withOrderId(orderId)) {
+            // MapStruct automatically uses LineItemMapper (from 'uses' parameter) to convert lineItems
+            var command = commandMapper.toCommand(request, orderId);
+            var order = placeOrderService.handle(command);
+            return responseMapper.toResponseV2(order);
+        }
     }
 }

@@ -1,8 +1,10 @@
 package com.ead.payments.orders.place;
 
 import com.google.common.base.Preconditions;
-import io.micrometer.core.annotation.Timed;
+import io.micrometer.observation.aop.Cardinality;
 import io.micrometer.observation.annotation.Observed;
+import io.micrometer.observation.annotation.ObservationKeyValue;
+import io.micrometer.observation.annotation.ObservationKeyValues;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,8 +23,13 @@ public class IssuerService {
         contextualName = "issuer-service.authorize",
         lowCardinalityKeyValues = {"service", "issuer", "operation", "authorize"}
     )
-    @Timed(value = "issuer.authorize", histogram = true, extraTags = {"service", "issuer"}, percentiles = {0.5, 0.95, 0.99})
-    public Authorization authorize(PlaceOrderCommand command) {
+    public Authorization authorize(
+            @ObservationKeyValues({
+                    @ObservationKeyValue(key = "currency", expression = "currency.currencyCode", cardinality = Cardinality.LOW),
+                    // Let Micrometer stringify the UUID to avoid SpEL method-call issues on record components.
+                    @ObservationKeyValue(key = "order.id", expression = "id", cardinality = Cardinality.HIGH)
+            })
+            PlaceOrderCommand command) {
 
         IssuerAuthorizationRequest request = new IssuerAuthorizationRequest(
                 command.currency(),

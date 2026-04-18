@@ -8,6 +8,7 @@ import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Log4j2
 @Component
@@ -16,7 +17,7 @@ public class InventoryListener {
 
     @ApplicationModuleListener
     public void on(OrderPlacedEvent event) throws InterruptedException {
-        Thread.sleep(Duration.ofSeconds(5));  // Simulate inventory update
+        Thread.sleep(sampleOrderPlacedDelayMillis());
         log.info("Reserving the Product. Inventory updated: {}", event.toString());
     }
 
@@ -24,5 +25,15 @@ public class InventoryListener {
     public void on(ProductCreatedEvent event) throws InterruptedException {
         Thread.sleep(Duration.ofSeconds(5));  // Simulate inventory update
         log.info("New Product created. SKU registered: {}", event.toString());
+    }
+
+    private long sampleOrderPlacedDelayMillis() {
+        // Keep most order events effectively instantaneous during performance tests,
+        // while still leaving a small tail of random short delays.
+        if (ThreadLocalRandom.current().nextInt(10) < 9) {
+            return 0L;
+        }
+
+        return ThreadLocalRandom.current().nextLong(1, 101);
     }
 }

@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   postgres:
     container_name: postgres
@@ -50,8 +48,10 @@ services:
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://:29092,PLAINTEXT_HOST://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -81,7 +81,7 @@ services:
           connections:
             kafka-local:
               properties:
-                bootstrap.servers: "kafka:9092"
+                bootstrap.servers: "kafka:29092"
     ports:
       - '8082:8080'
     depends_on:
@@ -89,102 +89,36 @@ services:
         condition: service_healthy
 
   wiremock:
-    image: rodolpheche/wiremock:latest
+    # Official WireMock image with native arm64 support for Apple Silicon.
+    image: wiremock/wiremock:3.13.2-2
     container_name: issuer-wiremock
     networks:
       - integration-test
     ports:
-      - '8081:8080'
+      - '18081:8080'
     volumes:
       - ./wiremock:/home/wiremock
-    command: --global-response-templating --verbose
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/__admin || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 20
-      start_period: 60s
+    entrypoint: ["/docker-entrypoint.sh", "--global-response-templating", "--verbose"]
 
-  prometheus:
-    image: prom/prometheus:v2.14.0
-    container_name: prometheus
+  observability:
+    # Single local LGTM stack with native OTLP ingest for logs, metrics and traces.
+    image: grafana/otel-lgtm:0.24.0
+    container_name: observability
     networks:
       - integration-test
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
-    ports:
-      - '9090:9090'
-    command: '--config.file=/etc/prometheus/config.yml'
     volumes:
-      - ./grafana/prometheus/prometheus.yml:/etc/prometheus/config.yml
-      - prometheus_data:/prometheus
-
-  tempo:
-    image: grafana/tempo:2.8.2
-    container_name: tempo
-    networks:
-      - integration-test
-    ports:
-      - '3200:3200'
-      - '9412:9411'
-    command: ['-config.file=/etc/tempo.yaml']
-    volumes:
-      - ./grafana/tempo/tempo.yaml:/etc/tempo.yaml
-      - tempo_data:/var/tempo
-
-  loki:
-    image: grafana/loki:2.9.8
-    container_name: loki
-    networks:
-      - integration-test
-    command: ['-config.file=/etc/loki/local-config.yaml']
-    ports:
-      - '3100:3100'
-    volumes:
-      - ./grafana/loki/loki-config.yaml:/etc/loki/local-config.yaml
-      - loki_data:/loki
-
-  promtail:
-    image: grafana/promtail:2.9.8
-    container_name: promtail
-    networks:
-      - integration-test
-    depends_on:
-      - loki
-    command: ['-config.file=/etc/promtail/config.yaml']
-    volumes:
-      - ./grafana/loki/promtail-config.yaml:/etc/promtail/config.yaml
-      - /var/log:/var/log
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-
-  grafana:
-    image: grafana/grafana:10.4.7
-    container_name: grafana
-    networks:
-      - integration-test
-    depends_on:
-      prometheus:
-        condition: service_started
+      # Provision custom dashboards automatically on every local startup.
+      - ./grafana/provisioning/dashboards/base-payments-provider.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/base-payments-provider.yaml:ro
+      - ./grafana/provisioning/dashboards/base-payments:/var/lib/grafana/dashboards/base-payments:ro
     ports:
       - '3000:3000'
-    environment:
-      GF_INSTALL_PLUGINS: ''
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
-      - ./grafana/provisioning/dashboards:/var/lib/grafana/dashboards
+      - '4317:4317'
+      - '4318:4318'
 
 volumes:
   kafka_data:
   postgres_data:
   pgadmin4_data:
-  prometheus_data:
-  grafana_data:
-  tempo_data:
-  loki_data:
 
 networks:
   integration-test:

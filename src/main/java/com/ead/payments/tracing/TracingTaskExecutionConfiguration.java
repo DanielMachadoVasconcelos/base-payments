@@ -1,20 +1,23 @@
 package com.ead.payments.tracing;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.task.SimpleAsyncTaskSchedulerCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.TaskDecorator;
+import org.springframework.core.task.support.ContextPropagatingTaskDecorator;
 
 @Configuration
-@RequiredArgsConstructor
 class TracingTaskExecutionConfiguration {
 
-    private final TaskDecorator tracingTaskDecorator;
+    @Bean
+    ContextPropagatingTaskDecorator contextPropagatingTaskDecorator() {
+        return new ContextPropagatingTaskDecorator();
+    }
 
     @Bean
-    SimpleAsyncTaskSchedulerCustomizer tracingTaskExecutionCustomizer() {
-        return builder -> builder.setTaskDecorator(tracingTaskDecorator);
+    SimpleAsyncTaskSchedulerCustomizer tracingTaskExecutionCustomizer(
+            ContextPropagatingTaskDecorator contextPropagatingTaskDecorator) {
+        // Spring Boot 4 recommends the shared context-propagation decorator instead of
+        // manually copying Brave trace state and MDC entries.
+        return builder -> builder.setTaskDecorator(contextPropagatingTaskDecorator);
     }
 }
-
