@@ -1,6 +1,7 @@
 package com.ead.payments.observability;
 
 import io.micrometer.observation.ObservationPredicate;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.observation.ClientRequestObservationContext;
@@ -19,7 +20,8 @@ class HttpObservationFilterConfigurationTest {
             new HttpObservationFilterConfiguration().noisyHttpObservationPredicate();
 
     @Test
-    void shouldIgnoreActuatorServerRequests() {
+    @DisplayName("Should ignore actuator server requests when the path starts with /actuator")
+    void shouldIgnoreActuatorServerRequestsWhenPathStartsWithActuator() {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/actuator/health");
         ServerRequestObservationContext context =
                 new ServerRequestObservationContext(request, new MockHttpServletResponse());
@@ -28,7 +30,8 @@ class HttpObservationFilterConfigurationTest {
     }
 
     @Test
-    void shouldKeepBusinessServerRequests() {
+    @DisplayName("Should keep business server requests when the path belongs to the application")
+    void shouldKeepBusinessServerRequestsWhenPathIsApplicationEndpoint() {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/orders");
         ServerRequestObservationContext context =
                 new ServerRequestObservationContext(request, new MockHttpServletResponse());
@@ -38,7 +41,8 @@ class HttpObservationFilterConfigurationTest {
     }
 
     @Test
-    void shouldIgnoreEurekaClientRequests() {
+    @DisplayName("Should ignore Eureka client requests when the target path starts with /eureka")
+    void shouldIgnoreEurekaClientRequestsWhenPathStartsWithEureka() {
         MockClientHttpRequest request =
                 new MockClientHttpRequest(HttpMethod.GET, URI.create("http://localhost:8761/eureka/apps/BASE-PAYMENTS"));
         ClientRequestObservationContext context = new ClientRequestObservationContext(request);
@@ -47,7 +51,8 @@ class HttpObservationFilterConfigurationTest {
     }
 
     @Test
-    void shouldKeepBusinessClientRequests() {
+    @DisplayName("Should keep business client requests when the target dependency is part of the business flow")
+    void shouldKeepBusinessClientRequestsWhenPathTargetsBusinessDependency() {
         MockClientHttpRequest request =
                 new MockClientHttpRequest(HttpMethod.POST, URI.create("http://localhost:18081/authorization"));
         ClientRequestObservationContext context = new ClientRequestObservationContext(request);
