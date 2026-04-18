@@ -57,12 +57,26 @@ jobs:
           java-version: '25'
           distribution: 'temurin'
 
+      - name: Start test infrastructure
+        run: |
+          docker compose -f docker-ci.yml up -d
+
+          until docker compose -f docker-ci.yml exec -T postgres pg_isready -U user -d orders; do
+            sleep 2
+          done
+
+          until docker compose -f docker-ci.yml exec -T kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1; do
+            sleep 2
+          done
+
       - name: Run Tests
         uses: gradle/gradle-build-action@v2
-        env:
-          SPRING_DOCKER_COMPOSE_FILE: docker-ci.yml
         with:
           arguments: test -Djava.compiler.args="--enable-preview" --parallel
+
+      - name: Stop test infrastructure
+        if: always()
+        run: docker compose -f docker-ci.yml down -v
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
