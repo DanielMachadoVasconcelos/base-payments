@@ -1,7 +1,7 @@
 services:
   postgres:
     container_name: postgres
-    image: postgres:latest
+    image: postgres:18.4
     networks:
       - integration-test
     volumes:
@@ -22,7 +22,7 @@ services:
 
   pgadmin:
     container_name: pgadmin4
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:9.15.0
     restart: always
     networks:
       - integration-test
@@ -41,7 +41,7 @@ services:
       retries: 3
 
   kafka:
-    image: apache/kafka:3.7.1
+    image: apache/kafka:4.3.0
     container_name: kafka
     networks:
       - integration-test
@@ -71,7 +71,7 @@ services:
       start_period: 120s
 
   akhq:
-    image: tchiotludo/akhq:latest
+    image: tchiotludo/akhq:0.27.1
     container_name: akhq
     networks:
       - integration-test
@@ -90,7 +90,7 @@ services:
 
   wiremock:
     # Official WireMock image with native arm64 support for Apple Silicon.
-    image: wiremock/wiremock:3.13.2-2
+    image: wiremock/wiremock:3.13.2-3
     container_name: issuer-wiremock
     networks:
       - integration-test
@@ -102,7 +102,7 @@ services:
 
   observability:
     # Single local LGTM stack with native OTLP ingest for logs, metrics and traces.
-    image: grafana/otel-lgtm:0.24.0
+    image: grafana/otel-lgtm:0.28.0
     container_name: observability
     networks:
       - integration-test
