@@ -1,11 +1,8 @@
 package com.ead.payments.orders.cancel;
 
 import com.ead.payments.SpringBootIntegrationTest;
-import com.ead.payments.logging.CorrelationId;
-import com.ead.payments.mocks.TestMocks;
-import com.ead.payments.orders.place.request.PlaceOrderRequestV1;
-import com.ead.payments.orders.place.response.PlaceOrderResponseV1;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Currency;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -25,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WithMockUser(username = "customer", roles = "CUSTOMER")
 class CancelOrderControllerTest extends SpringBootIntegrationTest {
 
     @Autowired
@@ -33,12 +30,16 @@ class CancelOrderControllerTest extends SpringBootIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private UUID orderId;
+
+    @BeforeEach
+    void placeOrderBeforeEachTest() throws Exception {
+        orderId = placeOrder(mockMvc, objectMapper);
+    }
+
     @Test
-    @WithMockUser(username = "user", roles = "USER")
     @DisplayName("Should allow to cancel an order by id when the order exists")
     void shouldAllowToCancelAnOrderByIdWhenTheOrderExists() throws Exception {
-        var orderId = placeOrder();
-
         // when: the cancel order request is made
         var response = mockMvc.perform(post("/orders/" + orderId + "/cancel")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -58,11 +59,8 @@ class CancelOrderControllerTest extends SpringBootIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "user", roles = "USER")
     @DisplayName("Should not cancel an order when the order is completed")
     void shouldNotCancelAnOrderWhenTheOrderIsCompleted() throws Exception {
-        var orderId = placeOrder();
-
         mockMvc.perform(put("/orders/" + orderId + "/complete")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("version", "1.0.0"))
@@ -83,28 +81,6 @@ class CancelOrderControllerTest extends SpringBootIntegrationTest {
         searchResponse.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status", is("COMPLETED")));
-    }
-
-    private UUID placeOrder() throws Exception {
-        //setup: issuer service with an authorized response
-        CorrelationId expectedCorrelationId = CorrelationId.random();
-        TestMocks.setup(issuerService())
-                .toAcceptTheAuthorizationWith(expectedCorrelationId);
-
-        // given: a valid place order request
-        var request = new PlaceOrderRequestV1(Currency.getInstance("USD"), 100L);
-
-        // and: the place order request is made
-        var orderPlacedResponse = mockMvc.perform(post("/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("version", "1.0.0")
-                .header("X-Correlation-ID", expectedCorrelationId)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
-
-        // and: the order id is extracted from the response
-        return objectMapper.readValue(orderPlacedResponse.andReturn().getResponse().getContentAsString(),
-                PlaceOrderResponseV1.class).getId();
     }
 
 }

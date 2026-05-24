@@ -25,6 +25,7 @@ Application version: `0.0.1-SNAPSHOT`
 ### Changed
 - Documented the complete-order endpoint in README and agent guides.
 - Documented the project preference for specific business-rule exceptions.
+- Moved repeated order-placement setup into JUnit `@BeforeEach` fixtures where appropriate.
 
 ### Verification
 - Passed: `./gradlew testClasses`

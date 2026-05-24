@@ -168,6 +168,8 @@ Before inventing a new class role, check these tests first.
 Checklist:
 
 - Extend `SpringBootIntegrationTest` unless a narrower slice test is enough.
+- Put shared fixture creation in `@BeforeEach` when every test in that scope needs it.
+- Use a `@Nested` test class when only a subset of scenarios shares expensive setup.
 - Autowire `MockMvc`.
 - Autowire the Jackson `ObjectMapper`.
 - Add `@WithMockUser` or explicit HTTP Basic auth.
@@ -187,4 +189,3 @@ Checklist:
 | JSON field missing | `snake_case` configuration and response DTO shape |
 | ArchUnit suffix failure | `ClassesNamesConventionTest` |
 | Test method naming failure | `TestMethodsConventionTest` |
-

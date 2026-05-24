@@ -325,6 +325,7 @@ The bad name does not match `should.*When.*` and has no display name.
 - External calls use gateway/client boundaries.
 - Cross-module communication uses events first.
 - Business-rule failures use specific exceptions named after the violated rule.
+- Repeated test fixtures belong in `@BeforeEach`; use nested scopes when only some tests need the fixture.
 - DTOs and tests use `snake_case`.
 - Tests follow `should...When...` and `@DisplayName`.
 - Feature work that will ship should update `CHANGELOG.md`.
