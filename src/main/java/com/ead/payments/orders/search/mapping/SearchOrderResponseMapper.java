@@ -15,6 +15,7 @@ public interface SearchOrderResponseMapper {
      */
     @Mapping(target = "id", source = "id")
     @Mapping(target = "version", source = "version")
+    @Mapping(target = "status", source = "status")
     @Mapping(target = "currency", source = "currency")
     @Mapping(target = "amount", source = "amount")
     @Mapping(target = "lineItems", source = "lineItems")

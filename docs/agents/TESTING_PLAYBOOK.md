@@ -47,6 +47,26 @@ class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
 - WireMock server named `issuer-service`
 - `issuerService()` helper for stubbing issuer responses
 
+Do not add business operations to the base class. Prefer injected test providers for reusable setup.
+
+## Test Providers
+
+Reusable hands-on test operations live under `src/test/java/com/ead/payments/providers`.
+
+Current providers:
+
+- `OrderPlacedProvider`: places an authorized order and returns `PlaceOrderResponseV1`.
+- `OrderCanceledProvider`: places an authorized order, cancels it, and returns `CancelOrderResponse`.
+
+Provider rules:
+
+- Providers are Spring-managed beans.
+- Tests inject providers; they do not call static public helper methods.
+- Provider class names should describe the provided business state, for example `OrderPlacedProvider`.
+- Providers should create only the precondition their name promises.
+- Providers can depend on test infrastructure beans, such as the named WireMock server registered by `SpringBootIntegrationTest`.
+- Do not push these operations into `SpringBootIntegrationTest`; avoid growing inheritance as a fixture mechanism.
+
 ## Issuer Stubbing
 
 Good:
@@ -199,6 +219,7 @@ Checklist:
 - Extend `SpringBootIntegrationTest` unless a narrower slice test is enough.
 - Put shared fixture creation in `@BeforeEach` when every test in that scope needs it.
 - Use a `@Nested` test class when only a subset of scenarios shares expensive setup.
+- Use injected providers such as `OrderPlacedProvider` for reusable business setup.
 - Add BDD comments that describe the business story under test.
 - Autowire `MockMvc`.
 - Autowire the Jackson `ObjectMapper`.

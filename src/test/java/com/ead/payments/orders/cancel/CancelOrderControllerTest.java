@@ -1,7 +1,7 @@
 package com.ead.payments.orders.cancel;
 
 import com.ead.payments.SpringBootIntegrationTest;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ead.payments.providers.OrderPlacedProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,14 +28,14 @@ class CancelOrderControllerTest extends SpringBootIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private OrderPlacedProvider orderPlacedProvider;
 
     private UUID orderId;
 
     @BeforeEach
     void placeOrderBeforeEachTest() throws Exception {
         // given: an authorized placed order exists for the customer
-        orderId = placeOrder(mockMvc, objectMapper);
+        orderId = orderPlacedProvider.placeOrder().getId();
     }
 
     @Test

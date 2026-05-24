@@ -25,15 +25,18 @@ Application version: `0.0.1-SNAPSHOT`
 ### Changed
 - Documented the complete-order endpoint in README and agent guides.
 - Documented the project preference for specific business-rule exceptions.
+- Exposed order lifecycle status in search-order responses.
 - Moved terminal-state exceptions into their vertical-slice packages and renamed them with noun-phrase class names.
 - Moved repeated order-placement setup into JUnit `@BeforeEach` fixtures where appropriate.
 - Added BDD story comments to the new cancel and complete order tests.
+- Replaced inherited order setup helper with injected test operation providers.
 
 ### Verification
+- Passed: `git diff --check -- CHANGELOG.md README.md docs/agents src/main/java/com/ead/payments/orders/search src/test/java/com/ead/payments`
 - Passed: `./gradlew testClasses`
 - Passed: `./gradlew test --tests 'com.ead.payments.architecture.*'`
-- Blocked: `./gradlew test --tests '*CompleteOrderControllerTest'` compiled, then failed during Spring context startup because PostgreSQL on `localhost:5432` was unavailable and the local Docker daemon could not be reached.
-- Not run: full `./gradlew test` due to the same infrastructure blocker.
+- Passed: `./gradlew test --tests '*CompleteOrderControllerTest' --tests '*CancelOrderControllerTest' --tests '*SearchOrderControllerTest'`
+- Passed: `./gradlew test`
 
 ## Release Template
 

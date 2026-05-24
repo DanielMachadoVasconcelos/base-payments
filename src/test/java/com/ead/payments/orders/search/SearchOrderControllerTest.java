@@ -67,6 +67,7 @@ class SearchOrderControllerTest extends SpringBootIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpectAll(
                         jsonPath("$.id", is(notNullValue())),
+                        jsonPath("$.status", is("PLACED")),
                         jsonPath("$.currency", is("USD")),
                         jsonPath("$.amount", is(100))
                 );

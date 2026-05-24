@@ -16,7 +16,8 @@ Do not use this as a substitute for reading the repo. Use it as a compass.
 - The user wants a root changelog where shipped work is recorded with date, application version, changes, and verification.
 - The user strongly prefers meaningful, specific domain exceptions over generic reusable exceptions for business-rule failures.
 - The user prefers class names that start with domain nouns/adjectives instead of verbs or command-like phrasing.
-- The user prefers common test fixtures to live in JUnit/Spring setup methods instead of being repeated in every test method.
+- The user prefers scope-local test fixtures to live in JUnit/Spring setup methods instead of being repeated in every test method.
+- The user dislikes inheritance as a fixture-sharing mechanism; prefer injected operation providers for reusable business setup in tests.
 - The user expects integration tests to include BDD story comments using Given/When/Then/And language focused on business context.
 
 ## Project Intent
@@ -90,3 +91,9 @@ YYYY-MM-DD - Agent note:
 - Why it matters: Tests now explain the business behavior being proven, not only the HTTP mechanics.
 - Verification: See `CHANGELOG.md` for the current verification status.
 - Follow-up: Keep BDD comments focused on business context.
+
+2026-05-24 - Test operation providers:
+- What changed: Moved order setup operations out of `SpringBootIntegrationTest` and into injected `OrderPlacedProvider` and `OrderCanceledProvider` beans.
+- Why it matters: Tests reuse meaningful business operations without growing inheritance.
+- Verification: See `CHANGELOG.md` for the current verification status.
+- Follow-up: Create new providers for reusable business states instead of adding static helpers or base-class methods.

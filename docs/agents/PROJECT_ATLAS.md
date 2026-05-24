@@ -111,7 +111,7 @@ Current controllers expose:
 
 - `POST /orders` with `version: 1.0.0` for V1 orders.
 - `POST /orders` without a version header for V2 line-item orders.
-- `GET /orders/{order_id}` with `version: 1.0.0`.
+- `GET /orders/{order_id}` with `version: 1.0.0`; returns the order lifecycle `status`.
 - `POST /orders/{order_id}/cancel` with `version: 1.0.0`.
 - `PUT /orders/{order_id}/complete` with `version: 1.0.0`.
 - `GET /orders/{order_id}/events` with `version: 1.0.0`.

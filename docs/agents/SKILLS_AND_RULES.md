@@ -334,6 +334,7 @@ The bad name does not match `should.*When.*` and has no display name.
 - Cross-module communication uses events first.
 - Business-rule failures use specific exceptions named after the violated rule.
 - Repeated test fixtures belong in `@BeforeEach`; use nested scopes when only some tests need the fixture.
+- Reusable business setup belongs in injected test providers, not static helpers or inherited base-class methods.
 - Integration tests should use BDD story comments that explain business context.
 - DTOs and tests use `snake_case`.
 - Tests follow `should...When...` and `@DisplayName`.

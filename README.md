@@ -129,7 +129,7 @@ Current controller surface:
 | --- | --- | --- | --- |
 | `POST` | `/orders` | Header `version: 1.0.0` creates a V1 order | `CUSTOMER` or `MERCHANT` |
 | `POST` | `/orders` | No version header defaults to V2 with line items | `CUSTOMER` or `MERCHANT` |
-| `GET` | `/orders/{order_id}` | Header `version: 1.0.0` | `CUSTOMER` or `MERCHANT` |
+| `GET` | `/orders/{order_id}` | Header `version: 1.0.0`; includes lifecycle `status` | `CUSTOMER` or `MERCHANT` |
 | `POST` | `/orders/{order_id}/cancel` | Header `version: 1.0.0` | `CUSTOMER` or `MERCHANT` |
 | `PUT` | `/orders/{order_id}/complete` | Header `version: 1.0.0`; idempotent for already completed orders | `CUSTOMER` or `MERCHANT` |
 | `GET` | `/orders/{order_id}/events` | Header `version: 1.0.0` | `CUSTOMER` or `MERCHANT` |
