@@ -62,3 +62,9 @@ YYYY-MM-DD - Agent note:
 - Why it matters: Future agents now have a documented entrypoint, project atlas, architecture guide, interaction map, testing playbook, rules, and memories.
 - Verification: Documentation consistency and link review should be run after edits.
 - Follow-up: Keep this memory file current when durable preferences or repo gotchas are discovered.
+
+2026-05-24 - Complete-order endpoint behavior chosen:
+- What changed: Planned and implemented `PUT /orders/{order_id}/complete`.
+- Why it matters: Completion is idempotent for already completed orders, cancelled orders cannot be completed, and first completion publishes `OrderCompletedEvent`.
+- Verification: See `CHANGELOG.md` for the current verification status.
+- Follow-up: Move the changelog entry from `Unreleased` into a dated release entry when this ships to `master`.

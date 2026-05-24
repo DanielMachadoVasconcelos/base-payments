@@ -131,6 +131,7 @@ Current controller surface:
 | `POST` | `/orders` | No version header defaults to V2 with line items | `CUSTOMER` or `MERCHANT` |
 | `GET` | `/orders/{order_id}` | Header `version: 1.0.0` | `CUSTOMER` or `MERCHANT` |
 | `POST` | `/orders/{order_id}/cancel` | Header `version: 1.0.0` | `CUSTOMER` or `MERCHANT` |
+| `PUT` | `/orders/{order_id}/complete` | Header `version: 1.0.0`; idempotent for already completed orders | `CUSTOMER` or `MERCHANT` |
 | `GET` | `/orders/{order_id}/events` | Header `version: 1.0.0` | `CUSTOMER` or `MERCHANT` |
 | `GET` | `/orders/{order_id}/events/{event_id}` | Header `version: 1.0.0` | `CUSTOMER` or `MERCHANT` |
 | `POST` | `/products` | Header `version: 1.0.0` | `ADMIN` |
@@ -180,6 +181,7 @@ com.ead.payments
   orders
     place
     cancel
+    complete
     search
     events
   products

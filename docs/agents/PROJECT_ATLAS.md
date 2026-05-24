@@ -66,6 +66,7 @@ Business modules:
 - `orders`: aggregate, order state, line items, repository, order events, and order use cases.
 - `orders.place`: place-order HTTP flow, request versions, issuer authorization, command and response mapping.
 - `orders.cancel`: cancel-order use case.
+- `orders.complete`: complete-order use case with idempotent completion semantics.
 - `orders.search`: search-order use case.
 - `orders.events`: read access over stored order events.
 - `products`: product aggregate and create-product use case.
@@ -112,6 +113,7 @@ Current controllers expose:
 - `POST /orders` without a version header for V2 line-item orders.
 - `GET /orders/{order_id}` with `version: 1.0.0`.
 - `POST /orders/{order_id}/cancel` with `version: 1.0.0`.
+- `PUT /orders/{order_id}/complete` with `version: 1.0.0`.
 - `GET /orders/{order_id}/events` with `version: 1.0.0`.
 - `GET /orders/{order_id}/events/{event_id}` with `version: 1.0.0`.
 - `POST /products` with `version: 1.0.0`.

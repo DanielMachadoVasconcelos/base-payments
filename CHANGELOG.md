@@ -17,7 +17,18 @@ Each shipped entry should include:
 
 Application version: `0.0.1-SNAPSHOT`
 
-- No feature entries yet.
+### Added
+- Added idempotent order completion with `PUT /orders/{order_id}/complete`.
+- Added `OrderCompletedEvent` for first-time `PLACED -> COMPLETED` transitions.
+
+### Changed
+- Documented the complete-order endpoint in README and agent guides.
+
+### Verification
+- Passed: `./gradlew testClasses`
+- Passed: `./gradlew test --tests 'com.ead.payments.architecture.*'`
+- Blocked: `./gradlew test --tests '*CompleteOrderControllerTest'` compiled, then failed during Spring context startup because PostgreSQL on `localhost:5432` was unavailable and the local Docker daemon could not be reached.
+- Not run: full `./gradlew test` due to the same infrastructure blocker.
 
 ## Release Template
 

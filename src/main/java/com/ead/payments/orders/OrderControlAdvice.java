@@ -42,4 +42,15 @@ public class OrderControlAdvice {
                 .status(HttpStatus.NOT_FOUND)
                 .body(problemDetail);
     }
+
+    @ExceptionHandler(OrderStateTransitionException.class)
+    public ResponseEntity<ProblemDetail> handleOrderStateTransitionException(OrderStateTransitionException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        problemDetail.setTitle("Invalid Order State Transition");
+        problemDetail.setDetail(ex.getMessage());
+        problemDetail.setType(URI.create("v1/orders"));
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(problemDetail);
+    }
 }

@@ -124,6 +124,28 @@ public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate> implem
         return this;
     }
 
+    public OrderAggregate complete() {
+        if (status == OrderStatus.COMPLETED) {
+            return this;
+        }
+
+        if (status != OrderStatus.PLACED) {
+            throw new OrderStateTransitionException(id, status, OrderStatus.COMPLETED);
+        }
+
+        this.status = OrderStatus.COMPLETED;
+
+        registerEvent(new OrderCompletedEvent(
+                id,
+                version,
+                status,
+                currency,
+                amount
+        ));
+
+        return this;
+    }
+
     @Override
     public UUID getId() {
         return id;

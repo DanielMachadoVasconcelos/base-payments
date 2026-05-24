@@ -91,6 +91,22 @@ CancelOrderController
 
 `OrderAggregate.cancel()` prevents cancellation of completed orders and emits `OrderCancelledEvent`.
 
+## Completion Flow
+
+```text
+CompleteOrderController
+  -> CompleteOrderService
+    -> OrderRepository.findById(orderId)
+    -> OrderAggregate.complete()
+      -> if PLACED, transition to COMPLETED and register OrderCompletedEvent
+      -> if COMPLETED, return the current aggregate without saving again
+      -> if CANCELLED, reject the transition
+    -> OrderRepository.save(aggregate) only for first completion
+  -> CompleteOrderResponse
+```
+
+`OrderAggregate.complete()` makes completion idempotent for already completed orders. Cancelled orders are terminal and cannot become completed.
+
 ## Event Read Flow
 
 ```text
@@ -110,6 +126,7 @@ Candid note: `EventsController` currently returns hardcoded fallback event respo
 | `orders` | Order aggregate, repository, line items, order events | Issuer authorization through `orders.place` | `OrderPlacedEvent`, `OrderCancelledEvent` |
 | `orders.place` | Place-order use case, issuer gateway/client | `OrderRepository`, `IssuerGateway` | Order aggregate events through save |
 | `orders.cancel` | Cancel-order use case | `OrderRepository` | `OrderCancelledEvent` through aggregate |
+| `orders.complete` | Complete-order use case | `OrderRepository` | `OrderCompletedEvent` through aggregate |
 | `orders.search` | Order lookup | `OrderRepository` | None |
 | `orders.events` | Event read API | Modulith/event publication persistence | None |
 | `products` | Product aggregate and create-product use case | `ProductRepository` | `ProductCreatedEvent` |
@@ -149,4 +166,3 @@ class InventoryListener {
 ```
 
 The current ArchUnit rules also check that listener components do not depend on repositories.
-

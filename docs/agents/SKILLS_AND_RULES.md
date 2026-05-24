@@ -287,3 +287,4 @@ The bad name does not match `should.*When.*` and has no display name.
 - Cross-module communication uses events first.
 - DTOs and tests use `snake_case`.
 - Tests follow `should...When...` and `@DisplayName`.
+- Feature work that will ship should update `CHANGELOG.md`.

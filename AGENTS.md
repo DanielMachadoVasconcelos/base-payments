@@ -72,6 +72,7 @@ The worktree may also contain generated or local-only directories such as `.grad
 com.ead.payments.orders
   place
   cancel
+  complete
   search
   events
 com.ead.payments.products
@@ -92,6 +93,8 @@ Core flow:
 6. `OrderRepository` persists the aggregate.
 7. Spring Modulith publishes events internally and externally.
 8. `InventoryListener` reacts to order/product events; `PurchaseListener` reacts to product events.
+
+Completion rule: `PUT /orders/{order_id}/complete` transitions `PLACED` orders to `COMPLETED`, returns the same completed order idempotently for already completed orders, and rejects cancelled orders.
 
 ## Testing Map
 
