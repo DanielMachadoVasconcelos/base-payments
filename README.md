@@ -1,143 +1,228 @@
 # Base Payments Service
-## Daniel Machado Vasconcelos
-[![Java CI with Gradle](https://github.com/DanielMachadoVasconcelos/base-payments/actions/workflows/gradle.yml/badge.svg)](https://github.com/DanielMachadoVasconcelos/base-payments/actions/workflows/gradle.yml)
 
-### Overview
-This project aims to demonstrate how Spring Modulith can be used to create a modular, maintainable architecture by ensuring small, self-contained modules without unnecessary package dependencies. The goal is to improve cohesion and reduce coupling, while leveraging event-driven design patterns and architectural best practices.
+Case-study service by Daniel Machado Vasconcelos.
 
-### Basic requirements:
-- **Spring Modulith**: Helps maintain modularity by abstracting architectural patterns, such as the **Outbox Pattern**, to handle event-driven communication efficiently without introducing tight coupling between modules.
-- **Event Sourcing**: Ensures all state changes are captured as immutable events, allowing for a more resilient, traceable, and auditable system.
-- **Apache Kafka**: Acts as the core message broker, enabling reliable and scalable communication between different modules.
-- **Spring Security**: Secures the service by enforcing authentication and authorization for all actions performed within the system.
-- **Spring MVC**: Exposes RESTful endpoints to manage and interact with orders and other core domain functionalities.
-- **Spring Data JPA**: Simplifies data persistence and retrieval, working seamlessly with the event sourcing approach.
-- **Docker Compose**: Provides an easy-to-deploy environment with all necessary services, including Kafka and PostgreSQL, making the project ready for local development and testing.
+[![Java CI with Gradle](https://github.com/DanielMachadoVasconcelos/base-payments/actions/workflows/workflow.yml/badge.svg)](https://github.com/DanielMachadoVasconcelos/base-payments/actions/workflows/workflow.yml)
 
-### Docker Compose Support
-This project contains a Docker Compose file named `compose.yaml`. In this file, the following services have been defined:
+## What This Project Is
 
-* **PostgreSQL**: [`postgres:latest`](https://hub.docker.com/_/postgres)
-* **Kafka**: [`bitnami/kafka:latest`](https://hub.docker.com/r/bitnami/kafka/)
-* **AKHQ** (Kafka GUI): [`tchiotludo/akhq:latest`](https://hub.docker.com/r/tchiotludo/akhq)
-* **Tempo** (Distributed tracing backend)
-* **Tempo** (Distributed tracing backend with Zipkin-compatible ingest exposed on `localhost:9412`)
-* **Prometheus** (Metrics)
-* **Grafana** (Dashboards)
-* **Loki + Promtail** (Centralised log aggregation and forwarding to Grafana)
+`base-payments` is a Spring Boot payments and order-management case study. It is intentionally shaped as a modular, observable, event-driven service so developers and AI agents can study how payment authorization, order placement, product registration, inventory reactions, and audit-style event access fit together without turning the codebase into a layered package maze.
 
-> Note: Please review the tags of the used images and set them to the same versions as those running in production to ensure consistency.
+The project demonstrates:
 
-# Getting Started
-## How to Build?
+- Spring Modulith modules organized by business capability and use case.
+- Order and product aggregates with domain events.
+- Reliable event publication through Spring Modulith and Kafka.
+- PostgreSQL persistence with Flyway migrations.
+- HTTP APIs secured with Spring Security.
+- External issuer authorization behind a gateway/client boundary.
+- Local observability with metrics, traces, logs, and Grafana dashboards.
+- Architecture tests that make naming, packaging, annotations, and test style executable rules.
 
-Clone this repository into a new project folder (e.g., `base-payments`).
+AI agents should start with [AGENTS.md](AGENTS.md) before changing anything.
+
+## Tech Stack
+
+- Java 25 with preview features enabled.
+- Spring Boot 4.0.6.
+- Spring Modulith 2.0.6.
+- Gradle wrapper.
+- PostgreSQL, Kafka, WireMock, Grafana LGTM, pgAdmin, AKHQ.
+- Flyway, Spring Data JPA, Spring Security, Spring MVC, MapStruct, Lombok.
+- JUnit 5, MockMvc, WireMock Spring Boot, ArchUnit, JaCoCo.
+
+## Getting Started
+
+### Prerequisites
+
+- JDK 25.
+- Docker with Docker Compose.
+- A shell that can run the Gradle wrapper.
+
+### Clone
 
 ```bash
 git clone https://github.com/DanielMachadoVasconcelos/base-payments.git
 cd base-payments
 ```
 
-Start the external resources by running the Docker Compose file. 
-
-> Note: This step is optional, since the spring boot applications will start the necessary resources automatically
+### Start Local Infrastructure
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
-## Running the Application
+`compose.yaml` starts the local services used by the app:
 
-To run the application, you can use the following command:
+| Service | URL or port | Purpose |
+| --- | --- | --- |
+| PostgreSQL | `localhost:5432` | Orders, products, Modulith event tables |
+| pgAdmin | `http://localhost:5050` | Database UI |
+| Kafka | `localhost:9092` | Event broker |
+| AKHQ | `http://localhost:8082` | Kafka UI |
+| WireMock issuer | `http://localhost:18081` | Mock payment issuer |
+| Grafana LGTM | `http://localhost:3000` | Metrics, traces, logs |
+| OTLP ingest | `localhost:4317`, `localhost:4318` | Telemetry ingest |
+
+Local database credentials:
+
+```text
+database: orders
+username: user
+password: password
+```
+
+pgAdmin credentials:
+
+```text
+username: admin@admin.com
+password: admin
+```
+
+### Run The Application
 
 ```bash
 ./gradlew bootRun
 ```
 
-This command will start the application on port `8080` by default.
+By default the service starts on `http://localhost:8080`.
 
-When the Docker Compose observability stack is running, the service automatically forwards structured logs to Loki via the `com.github.loki4j:loki-logback-appender`. The default push URL is `http://localhost:3100/loki/api/v1/push`; override it as needed:
+Useful local URLs:
+
+- Swagger UI: `http://localhost:8080/swagger-ui-html`
+- Actuator health: `http://localhost:8080/actuator/health`
+- Grafana: `http://localhost:3000`
+- AKHQ: `http://localhost:8082`
+- pgAdmin: `http://localhost:5050`
+
+### Run Tests
+
+The integration tests expect PostgreSQL and Kafka on localhost. For a local run, start `compose.yaml` first:
 
 ```bash
-LOKI_URL=http://localhost:3100/loki/api/v1/push ./gradlew bootRun
+docker compose up -d
+./gradlew test
 ```
 
-With Grafana, Loki, Tempo running you can:
+CI starts a smaller infrastructure set from `docker-ci.yml`, then runs:
 
-- Explore metrics via the `HTTP Requests Monitoring` dashboard.
-- Monitor end-to-end service health with the imported `Spring Boot Observability` dashboard (Grafana ID `17175`), provisioned automatically under `Dashboards → Spring Boot Observability`.
-- View correlated logs in Grafana Explore (`Loki` datasource) – log lines embed both `correlationId` and `traceId`.
-- Jump from a log line to a trace (derived field on `traceId`) or search recent traces via the Tempo datasource (spans are exported to Tempo through its Zipkin-compatible endpoint exposed on `localhost:9412`).
-
-## Testing the Application
-
-You can test the application by sending HTTP requests to the exposed endpoints. The application provides the following endpoints:
-
-* `POST /api/orders`: Creates a new order
-* `GET /api/orders/{id}`: Retrieves an order by its ID
-* `GET /api/orders`: Retrieves all orders
-* `PUT /api/orders/{id}/cancel`: Cancels an order by its ID
-* `PUT /api/orders/{id}/complete`: Completes an order by its ID
-* `POST /api/orders/{id}/items`:  Adds an item to an order by its ID
-* `DELETE /api/orders/{id}/items/{itemId}`: Removes an item from an order by its ID and item ID
-* `GET /api/orders/{id}/events`: Retrieves all events for an order by its ID
-* `GET /api/orders/{id}/events/{eventId}`: Retrieves a specific event for an order by its ID and event ID
-
-## Curl comands
-
-#### To create a order
 ```bash
-curl --location --request POST 'localhost:5000/v1/orders' \
---header 'Content-Type: application/json' \
---data-raw '{
+./gradlew test -Djava.compiler.args="--enable-preview" --parallel
+```
+
+The Gradle `test` task runs JUnit 5 tests, architecture tests, and then produces JaCoCo reports.
+
+## API Surface
+
+Security is enabled. In local and integration-test profiles, these users exist:
+
+| Username | Password | Role |
+| --- | --- | --- |
+| `customer` | `password` | `CUSTOMER` |
+| `merchant` | `password` | `MERCHANT` |
+| `engineer` | `password` | `ADMIN` |
+| `grafana` | `password` | `ADMIN` |
+
+Current controller surface:
+
+| Method | Path | Version behavior | Role intent |
+| --- | --- | --- | --- |
+| `POST` | `/orders` | Header `version: 1.0.0` creates a V1 order | `CUSTOMER` or `MERCHANT` |
+| `POST` | `/orders` | No version header defaults to V2 with line items | `CUSTOMER` or `MERCHANT` |
+| `GET` | `/orders/{order_id}` | Header `version: 1.0.0` | `CUSTOMER` or `MERCHANT` |
+| `POST` | `/orders/{order_id}/cancel` | Header `version: 1.0.0` | `CUSTOMER` or `MERCHANT` |
+| `GET` | `/orders/{order_id}/events` | Header `version: 1.0.0` | `CUSTOMER` or `MERCHANT` |
+| `GET` | `/orders/{order_id}/events/{event_id}` | Header `version: 1.0.0` | `CUSTOMER` or `MERCHANT` |
+| `POST` | `/products` | Header `version: 1.0.0` | `ADMIN` |
+
+Example V2 order request:
+
+```bash
+curl --request POST 'http://localhost:8080/orders' \
+  --user customer:password \
+  --header 'Content-Type: application/json' \
+  --header 'X-Correlation-ID: demo-correlation-id' \
+  --data '{
+    "currency": "USD",
+    "line_items": [
+      {
+        "name": "Wireless Bluetooth Headphones",
+        "quantity": 2,
+        "unit_price": 1000,
+        "reference": "SKU-HEADPHONE-001"
+      }
+    ]
+  }'
+```
+
+Example V1 order request:
+
+```bash
+curl --request POST 'http://localhost:8080/orders' \
+  --user customer:password \
+  --header 'Content-Type: application/json' \
+  --header 'version: 1.0.0' \
+  --header 'X-Correlation-ID: demo-correlation-id' \
+  --data '{
     "currency": "USD",
     "amount": 3500
-}'
+  }'
 ```
 
-### Postgres
-> Note:  Access the local url (localhost:5050) in your favorite browser to verify the Postgres Database Admin UI.
+JSON uses `snake_case` globally.
 
-**Use the following credentials:**
+## Architecture At A Glance
 
-| username      | password |
-|---------------|--------|
-| admin@admin.com | admin | 
+The code is organized around business modules and vertical slices:
 
-Or access the database using the following command:
-```bash
-PGPASSWORD=password psql -U user -h localhost orders
+```text
+com.ead.payments
+  orders
+    place
+    cancel
+    search
+    events
+  products
+  inventory
+  purchases
+  logging
+  security
+  observability
+  auditing
+  tracing
 ```
 
-### Kafka
+Core rules:
 
-> Note: Access the local url (localhost:8080) in your favorite browser to verify the Kafka GUI.
+- Controllers translate HTTP to commands and responses.
+- Services orchestrate use cases and define transactional flow.
+- Aggregates enforce invariants and publish domain events.
+- Repositories persist aggregate roots.
+- External systems sit behind gateways and clients.
+- Cross-module communication should prefer Spring Modulith events.
+- Cross-cutting concerns belong in configuration, filters, interceptors, and advice.
 
-**Look for the following topics:**
+The architecture tests in `src/test/java/com/ead/payments/architecture` are the executable source of truth for naming, annotations, package layering, immutable event style, and test method names.
 
-- `orders-events.v1.topic`
+## Observability
 
+`compose.yaml` runs `grafana/otel-lgtm`, and `application.yml` exports local telemetry through OTLP:
 
+- Metrics: `http://localhost:4318/v1/metrics`
+- Traces: `http://localhost:4318/v1/traces`
+- Logs: `http://localhost:4318/v1/logs`
 
-### Reference Documentation
-For further reference, please consider the following sections:
+Useful dashboards are provisioned under `grafana/provisioning/dashboards`.
 
-* [Official Gradle Documentation](https://docs.gradle.org)
-* [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/docs/3.3.2/gradle-plugin/reference/html/)
-* [Create an OCI Image](https://docs.spring.io/spring-boot/docs/3.3.2/gradle-plugin/reference/html/#build-image)
-* [Docker Compose Support](https://docs.spring.io/spring-boot/docs/3.3.2/reference/htmlsingle/index.html#features.docker-compose)
-* [Spring Modulith](https://docs.spring.io/spring-modulith/reference/)
-* [Spring for Apache Kafka](https://docs.spring.io/spring-boot/docs/3.3.2/reference/htmlsingle/index.html#messaging.kafka)
-* [Spring Boot DevTools](https://docs.spring.io/spring-boot/docs/3.3.2/reference/htmlsingle/index.html#using.devtools)
-* [Spring Configuration Processor](https://docs.spring.io/spring-boot/docs/3.3.2/reference/htmlsingle/index.html#appendix.configuration-metadata.annotation-processor)
-* [Spring Web](https://docs.spring.io/spring-boot/docs/3.3.2/reference/htmlsingle/index.html#web)
-* [Spring Data JPA](https://docs.spring.io/spring-boot/docs/3.3.2/reference/htmlsingle/index.html#data.sql.jpa)
+Correlation and principal information are handled by interceptors in `src/main/java/com/ead/payments/logging`. Business services should stay focused on domain behavior, not request plumbing.
 
-### Guides
-The following guides illustrate how to use some features concretely:
+## Notes For Future Agents
 
-* [Messaging with Kafka](https://spring.io/guides/gs/messaging-kafka/)
-* [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
-* [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
-* [Building REST services with Spring](https://spring.io/guides/tutorials/rest/)
-* [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
+This repository has a dedicated AI-agent guide:
+
+- [AGENTS.md](AGENTS.md)
+- [docs/agents/README.md](docs/agents/README.md)
+- [docs/agents/MEMORIES.md](docs/agents/MEMORIES.md)
+- [CHANGELOG.md](CHANGELOG.md)
+
+When documentation disagrees with code, trust `build.gradle`, `compose.yaml`, `src/main/java`, `src/test/java`, and the architecture tests first. Then update the docs so the next agent has one fewer trap to step around.
