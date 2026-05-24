@@ -1,5 +1,7 @@
 package com.ead.payments.orders;
 
+import com.ead.payments.orders.cancel.CompletedOrderCancellationException;
+import com.ead.payments.orders.complete.CancelledOrderCompletionException;
 import java.net.URI;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -44,8 +46,8 @@ public class OrderControlAdvice {
     }
 
     @ExceptionHandler({
-            CannotCancelCompletedOrderException.class,
-            CannotCompleteCancelledOrderException.class
+            CompletedOrderCancellationException.class,
+            CancelledOrderCompletionException.class
     })
     public ResponseEntity<ProblemDetail> handleTerminalOrderStateException(RuntimeException ex) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.CONFLICT);

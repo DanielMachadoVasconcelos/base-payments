@@ -109,8 +109,8 @@ CompleteOrderController
 
 Terminal-state violations should use specific exceptions:
 
-- `CannotCompleteCancelledOrderException`
-- `CannotCancelCompletedOrderException`
+- `CancelledOrderCompletionException` in `orders.complete`
+- `CompletedOrderCancellationException` in `orders.cancel`
 
 ## Event Read Flow
 

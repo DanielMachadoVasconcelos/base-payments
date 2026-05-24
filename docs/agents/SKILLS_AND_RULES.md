@@ -51,6 +51,7 @@ Additional naming rules:
 
 - ASCII/English names only.
 - No underscores in class names.
+- Class names should not start with verbs or command-like modal words. Prefer noun phrases that name the concept or failure.
 - Prefer descriptive names over abbreviations.
 - Do not invent `Helper`, `Util`, `Manager`, or `Processor` classes unless the architecture tests are intentionally updated.
 
@@ -261,9 +262,11 @@ Prefer specific domain exceptions for meaningful business failures. Do not hide 
 Good:
 
 ```java
-public class CannotCompleteCancelledOrderException extends RuntimeException {
+package com.ead.payments.orders.complete;
 
-    public CannotCompleteCancelledOrderException(UUID orderId) {
+public class CancelledOrderCompletionException extends RuntimeException {
+
+    public CancelledOrderCompletionException(UUID orderId) {
         super("The cancelled order with id " + orderId + " cannot be completed");
     }
 }
@@ -272,9 +275,11 @@ public class CannotCompleteCancelledOrderException extends RuntimeException {
 Good:
 
 ```java
-public class CannotCancelCompletedOrderException extends RuntimeException {
+package com.ead.payments.orders.cancel;
 
-    public CannotCancelCompletedOrderException(UUID orderId) {
+public class CompletedOrderCancellationException extends RuntimeException {
+
+    public CompletedOrderCancellationException(UUID orderId) {
         super("The completed order with id " + orderId + " cannot be cancelled");
     }
 }
@@ -292,6 +297,8 @@ public class OrderStateTransitionException extends RuntimeException {
 ```
 
 The bad version is technically reusable, but it hides the business language. In this project, prefer exceptions that name the rule the user violated.
+
+Also avoid names such as `CannotCompleteCancelledOrderException`. They are specific, but they read like command phrases. Prefer noun phrases such as `CancelledOrderCompletionException`.
 
 ## Test Good/Bad
 
@@ -318,6 +325,7 @@ The bad name does not match `should.*When.*` and has no display name.
 
 - Package lives under `com.ead.payments.<feature>[.<usecase>]`.
 - Class suffix is allowed by ArchUnit.
+- Class name starts with a domain noun/adjective, not a verb.
 - Suffix annotation is correct.
 - Controller is thin.
 - Service orchestrates the use case.

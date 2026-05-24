@@ -15,6 +15,7 @@ Do not use this as a substitute for reading the repo. Use it as a compass.
 - The user expects agents to preserve their work and not revert unrelated changes.
 - The user wants a root changelog where shipped work is recorded with date, application version, changes, and verification.
 - The user strongly prefers meaningful, specific domain exceptions over generic reusable exceptions for business-rule failures.
+- The user prefers class names that start with domain nouns/adjectives instead of verbs or command-like phrasing.
 - The user prefers common test fixtures to live in JUnit/Spring setup methods instead of being repeated in every test method.
 
 ## Project Intent
@@ -72,10 +73,10 @@ YYYY-MM-DD - Agent note:
 - Follow-up: Move the changelog entry from `Unreleased` into a dated release entry when this ships to `master`.
 
 2026-05-24 - Specific terminal-state exceptions:
-- What changed: Replaced generic order state transition handling with `CannotCompleteCancelledOrderException` and `CannotCancelCompletedOrderException`.
+- What changed: Replaced generic order state transition handling with `CancelledOrderCompletionException` and `CompletedOrderCancellationException`.
 - Why it matters: The code now speaks the business rule directly in DDD language.
 - Verification: See `CHANGELOG.md` for the current verification status.
-- Follow-up: Use specific exceptions for future business-rule failures.
+- Follow-up: Use specific noun-phrase exceptions for future business-rule failures.
 
 2026-05-24 - Test fixture setup preference:
 - What changed: Moved repeated order placement into JUnit `@BeforeEach` setup where each scenario needs a placed order.
