@@ -109,8 +109,8 @@ CI uses `docker-ci.yml`, which only starts PostgreSQL and Kafka.
 
 Current controllers expose:
 
-- `POST /orders` with `version: 1.0.0` for V1 orders.
-- `POST /orders` without a version header for V2 line-item orders.
+- `POST /orders` with `version: 1.0.0` for V1 orders; returns order `version` and lifecycle `status`.
+- `POST /orders` without a version header for V2 line-item orders; returns order `version` and lifecycle `status`.
 - `GET /orders/{order_id}` with `version: 1.0.0`; returns the order lifecycle `status`.
 - `POST /orders/{order_id}/cancel` with `version: 1.0.0`.
 - `PUT /orders/{order_id}/complete` with `version: 1.0.0`.

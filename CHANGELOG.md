@@ -25,6 +25,7 @@ Application version: `0.0.1-SNAPSHOT`
 ### Changed
 - Documented the complete-order endpoint in README and agent guides.
 - Documented the project preference for specific business-rule exceptions.
+- Returned order `version` and lifecycle `status` from both V1 and V2 place-order responses.
 - Exposed order lifecycle status in search-order responses.
 - Moved terminal-state exceptions into their vertical-slice packages and renamed them with noun-phrase class names.
 - Moved repeated order-placement setup into JUnit `@BeforeEach` fixtures where appropriate.
@@ -32,11 +33,13 @@ Application version: `0.0.1-SNAPSHOT`
 - Replaced inherited order setup helper with injected test operation providers.
 
 ### Verification
-- Passed: `git diff --check -- CHANGELOG.md README.md docs/agents src/main/java/com/ead/payments/orders/search src/test/java/com/ead/payments`
+- Passed: `git diff --check -- CHANGELOG.md README.md docs/agents/PROJECT_ATLAS.md src/main/java/com/ead/payments/orders/place src/test/java/com/ead/payments/orders/place`
 - Passed: `./gradlew testClasses`
 - Passed: `./gradlew test --tests 'com.ead.payments.architecture.*'`
 - Passed: `./gradlew test --tests '*CompleteOrderControllerTest' --tests '*CancelOrderControllerTest' --tests '*SearchOrderControllerTest'`
-- Passed: `./gradlew test`
+- Passed: `./gradlew --no-daemon cleanTest test --tests '*PlaceOrdersControllerTest'`
+- Passed: `./gradlew --no-daemon cleanTest test --tests '*PlaceOrdersControllerTest' --tests '*CompleteOrderControllerTest' --tests '*CancelOrderControllerTest'`
+- Passed: `./gradlew --no-daemon test`
 
 ## Release Template
 

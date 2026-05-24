@@ -14,6 +14,8 @@ public interface PlaceOrderResponseMapper {
      * Maps Order domain to V1 response (without line items).
      */
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "version", source = "version")
+    @Mapping(target = "status", source = "status")
     @Mapping(target = "currency", source = "currency")
     @Mapping(target = "amount", source = "amount")
     PlaceOrderResponseV1 toResponseV1(Order order);
@@ -23,6 +25,8 @@ public interface PlaceOrderResponseMapper {
      * MapStruct automatically uses LineItemResponseMapper (from 'uses') to convert lineItems.
      */
     @Mapping(target = "id", source = "id")
+    @Mapping(target = "version", source = "version")
+    @Mapping(target = "status", source = "status")
     @Mapping(target = "currency", source = "currency")
     @Mapping(target = "amount", source = "amount")
     @Mapping(target = "lineItems", source = "lineItems")

@@ -127,8 +127,8 @@ Current controller surface:
 
 | Method | Path | Version behavior | Role intent |
 | --- | --- | --- | --- |
-| `POST` | `/orders` | Header `version: 1.0.0` creates a V1 order | `CUSTOMER` or `MERCHANT` |
-| `POST` | `/orders` | No version header defaults to V2 with line items | `CUSTOMER` or `MERCHANT` |
+| `POST` | `/orders` | Header `version: 1.0.0` creates a V1 order and returns `version`/`status` | `CUSTOMER` or `MERCHANT` |
+| `POST` | `/orders` | No version header defaults to V2 with line items and returns `version`/`status` | `CUSTOMER` or `MERCHANT` |
 | `GET` | `/orders/{order_id}` | Header `version: 1.0.0`; includes lifecycle `status` | `CUSTOMER` or `MERCHANT` |
 | `POST` | `/orders/{order_id}/cancel` | Header `version: 1.0.0` | `CUSTOMER` or `MERCHANT` |
 | `PUT` | `/orders/{order_id}/complete` | Header `version: 1.0.0`; idempotent for already completed orders | `CUSTOMER` or `MERCHANT` |
