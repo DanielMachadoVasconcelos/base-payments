@@ -52,10 +52,12 @@ class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
                 .header("X-Correlation-ID", expectedCorrelationId) // distinct correlation ID for each request to ensure wiremock stubs are matched
                 .content(objectMapper.writeValueAsString(request)));
 
-        // then: the response is 201
+        // then: the response is 201 and exposes the placed order lifecycle state
         response.andDo(print())
                 .andExpect(status().isCreated())
                 .andExpectAll(jsonPath("$.id", is(notNullValue())),
+                        jsonPath("$.version", is(0)),
+                        jsonPath("$.status", is("PLACED")),
                         jsonPath("$.currency", is("USD")),
                         jsonPath("$.amount", is(100)));
     }
@@ -86,12 +88,14 @@ class PlaceOrdersControllerTest extends SpringBootIntegrationTest {
                 .header("X-Correlation-ID", expectedCorrelationId)
                 .content(objectMapper.writeValueAsString(request)));
 
-        // then: the response is 201 with line items
+        // then: the response is 201 with line items and exposes the placed order lifecycle state
         // Expected total: (2 * 1000) + (1 * 2000) = 4000
         response.andDo(print())
                 .andExpect(status().isCreated())
                 .andExpectAll(
                         jsonPath("$.id", is(notNullValue())),
+                        jsonPath("$.version", is(0)),
+                        jsonPath("$.status", is("PLACED")),
                         jsonPath("$.currency", is("USD")),
                         jsonPath("$.amount", is(4000)),
                         jsonPath("$.line_items", is(notNullValue())),

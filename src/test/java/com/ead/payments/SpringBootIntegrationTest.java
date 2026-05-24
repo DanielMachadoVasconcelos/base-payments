@@ -14,7 +14,13 @@ import static com.ead.payments.mocks.WireMockProvider.IssuerServiceMockProvider;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("integration-test")
-@EnableWireMock({@ConfigureWireMock(name = "issuer-service", baseUrlProperties = "issuer.client.base-url")})
+@EnableWireMock({
+        @ConfigureWireMock(
+                name = "issuer-service",
+                baseUrlProperties = "issuer.client.base-url",
+                registerSpringBean = true
+        )
+})
 public class SpringBootIntegrationTest {
 
     @InjectWireMock("issuer-service")

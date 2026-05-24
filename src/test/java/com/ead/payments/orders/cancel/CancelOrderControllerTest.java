@@ -1,11 +1,8 @@
 package com.ead.payments.orders.cancel;
 
 import com.ead.payments.SpringBootIntegrationTest;
-import com.ead.payments.logging.CorrelationId;
-import com.ead.payments.mocks.TestMocks;
-import com.ead.payments.orders.place.request.PlaceOrderRequestV1;
-import com.ead.payments.orders.place.response.PlaceOrderResponseV1;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ead.payments.providers.OrderPlacedProvider;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,54 +10,44 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Currency;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WithMockUser(username = "customer", roles = "CUSTOMER")
 class CancelOrderControllerTest extends SpringBootIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private OrderPlacedProvider orderPlacedProvider;
+
+    private UUID orderId;
+
+    @BeforeEach
+    void placeOrderBeforeEachTest() throws Exception {
+        // given: an authorized placed order exists for the customer
+        orderId = orderPlacedProvider.placeOrder().getId();
+    }
 
     @Test
-    @WithMockUser(username = "user", roles = "USER")
     @DisplayName("Should allow to cancel an order by id when the order exists")
     void shouldAllowToCancelAnOrderByIdWhenTheOrderExists() throws Exception {
-        //setup: issuer service with an authorized response
-        CorrelationId expectedCorrelationId = CorrelationId.random();
-        TestMocks.setup(issuerService())
-                .toAcceptTheAuthorizationWith(expectedCorrelationId);
-
-        // given: a valid place order request
-        var request = new PlaceOrderRequestV1(Currency.getInstance("USD"), 100L);
-
-        // and: the place order request is made
-        var orderPlacedResponse = mockMvc.perform(post("/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("version", "1.0.0")
-                .header("X-Correlation-ID", expectedCorrelationId)
-                .content(objectMapper.writeValueAsString(request))
-        );
-
-        // and: the order id is extracted from the response
-        var orderId = objectMapper.readValue(orderPlacedResponse.andReturn().getResponse().getContentAsString(),
-                PlaceOrderResponseV1.class).getId();
-
-        // when: the cancel order request is made
+        // when: the customer cancels the placed order
         var response = mockMvc.perform(post("/orders/" + orderId + "/cancel")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("version", "1.0.0")
         );
 
-        // then: the response is 200
+        // then: the order becomes cancelled and keeps its commercial details
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpectAll(
@@ -70,6 +57,35 @@ class CancelOrderControllerTest extends SpringBootIntegrationTest {
                         jsonPath("$.status", is("CANCELLED")),
                         jsonPath("$.version", is(1))
                 );
+    }
+
+    @Test
+    @DisplayName("Should not cancel an order when the order is completed")
+    void shouldNotCancelAnOrderWhenTheOrderIsCompleted() throws Exception {
+        // given: the order has already reached the completed terminal state
+        mockMvc.perform(put("/orders/" + orderId + "/complete")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("version", "1.0.0"))
+                .andExpect(status().isOk());
+
+        // when: the customer tries to cancel the completed order
+        var cancelResponse = mockMvc.perform(post("/orders/" + orderId + "/cancel")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("version", "1.0.0"));
+
+        // then: the domain rejects the invalid terminal-state transition
+        cancelResponse.andDo(print())
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail", is("The completed order with id " + orderId + " cannot be cancelled")));
+
+        // and: the order remains completed
+        var searchResponse = mockMvc.perform(get("/orders/" + orderId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("version", "1.0.0"));
+
+        searchResponse.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is("COMPLETED")));
     }
 
 }

@@ -1,5 +1,7 @@
 package com.ead.payments.orders;
 
+import com.ead.payments.orders.cancel.CompletedOrderCancellationException;
+import com.ead.payments.orders.complete.CancelledOrderCompletionException;
 import java.net.URI;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -40,6 +42,20 @@ public class OrderControlAdvice {
         problemDetail.setType(URI.create("v1/orders"));
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
+                .body(problemDetail);
+    }
+
+    @ExceptionHandler({
+            CompletedOrderCancellationException.class,
+            CancelledOrderCompletionException.class
+    })
+    public ResponseEntity<ProblemDetail> handleTerminalOrderStateException(RuntimeException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        problemDetail.setTitle("Terminal Order State");
+        problemDetail.setDetail(ex.getMessage());
+        problemDetail.setType(URI.create("v1/orders"));
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
                 .body(problemDetail);
     }
 }

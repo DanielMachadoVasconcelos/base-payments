@@ -1,5 +1,6 @@
 package com.ead.payments.orders.search;
 
+import com.ead.payments.orders.Order.OrderStatus;
 import com.ead.payments.orders.response.LineItemResponse;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -18,6 +19,7 @@ public class SearchOrderResponse {
 
     private @NotNull UUID id;
     private @NotNull @Min(0L) Long version;
+    private @NotNull OrderStatus status;
     private @NotNull Currency currency;
     private @NotNull Long amount;
     private @NotNull List<LineItemResponse> lineItems;

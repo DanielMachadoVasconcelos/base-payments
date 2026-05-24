@@ -1,5 +1,7 @@
 package com.ead.payments.orders;
 
+import com.ead.payments.orders.cancel.CompletedOrderCancellationException;
+import com.ead.payments.orders.complete.CancelledOrderCompletionException;
 import com.ead.payments.orders.place.PlaceOrderCommand;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -109,11 +111,35 @@ public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate> implem
     }
 
     public OrderAggregate cancel() {
-        Preconditions.checkState(status != OrderStatus.COMPLETED, "The order is already completed");
+        if (status == OrderStatus.COMPLETED) {
+            throw new CompletedOrderCancellationException(id);
+        }
 
         this.status = OrderStatus.CANCELLED;
 
         registerEvent(new OrderCancelledEvent(
+                id,
+                version,
+                status,
+                currency,
+                amount
+        ));
+
+        return this;
+    }
+
+    public OrderAggregate complete() {
+        if (status == OrderStatus.COMPLETED) {
+            return this;
+        }
+
+        if (status == OrderStatus.CANCELLED) {
+            throw new CancelledOrderCompletionException(id);
+        }
+
+        this.status = OrderStatus.COMPLETED;
+
+        registerEvent(new OrderCompletedEvent(
                 id,
                 version,
                 status,

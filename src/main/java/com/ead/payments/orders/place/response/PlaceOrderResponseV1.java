@@ -1,5 +1,6 @@
 package com.ead.payments.orders.place.response;
 
+import com.ead.payments.orders.Order.OrderStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,8 +16,13 @@ import java.util.UUID;
 public class PlaceOrderResponseV1 {
 
     private UUID id;
+    private @NotNull Long version;
+    private @NotNull OrderStatus status;
     private @NotBlank Currency currency;
     private @NotNull Long amount;
 
-}
+    public PlaceOrderResponseV1(UUID id, Currency currency, Long amount) {
+        this(id, null, null, currency, amount);
+    }
 
+}
