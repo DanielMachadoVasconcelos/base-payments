@@ -98,7 +98,8 @@ class CompleteOrderControllerTest extends SpringBootIntegrationTest {
                 .header("version", "1.0.0"));
 
         completeResponse.andDo(print())
-                .andExpect(status().isConflict());
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail", is("The cancelled order with id " + orderId + " cannot be completed")));
 
         var searchResponse = mockMvc.perform(get("/orders/" + orderId)
                 .contentType(MediaType.APPLICATION_JSON)

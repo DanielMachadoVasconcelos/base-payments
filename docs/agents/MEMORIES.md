@@ -14,6 +14,7 @@ Do not use this as a substitute for reading the repo. Use it as a compass.
 - The user wants architecture, design, tests, module interactions, skills/rules, and memories documented for future agents.
 - The user expects agents to preserve their work and not revert unrelated changes.
 - The user wants a root changelog where shipped work is recorded with date, application version, changes, and verification.
+- The user strongly prefers meaningful, specific domain exceptions over generic reusable exceptions for business-rule failures.
 
 ## Project Intent
 
@@ -68,3 +69,9 @@ YYYY-MM-DD - Agent note:
 - Why it matters: Completion is idempotent for already completed orders, cancelled orders cannot be completed, and first completion publishes `OrderCompletedEvent`.
 - Verification: See `CHANGELOG.md` for the current verification status.
 - Follow-up: Move the changelog entry from `Unreleased` into a dated release entry when this ships to `master`.
+
+2026-05-24 - Specific terminal-state exceptions:
+- What changed: Replaced generic order state transition handling with `CannotCompleteCancelledOrderException` and `CannotCancelCompletedOrderException`.
+- Why it matters: The code now speaks the business rule directly in DDD language.
+- Verification: See `CHANGELOG.md` for the current verification status.
+- Follow-up: Use specific exceptions for future business-rule failures.

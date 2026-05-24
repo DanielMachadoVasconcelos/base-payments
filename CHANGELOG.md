@@ -20,9 +20,11 @@ Application version: `0.0.1-SNAPSHOT`
 ### Added
 - Added idempotent order completion with `PUT /orders/{order_id}/complete`.
 - Added `OrderCompletedEvent` for first-time `PLACED -> COMPLETED` transitions.
+- Added specific terminal-state exceptions for completing cancelled orders and cancelling completed orders.
 
 ### Changed
 - Documented the complete-order endpoint in README and agent guides.
+- Documented the project preference for specific business-rule exceptions.
 
 ### Verification
 - Passed: `./gradlew testClasses`

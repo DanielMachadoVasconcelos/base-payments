@@ -107,6 +107,11 @@ CompleteOrderController
 
 `OrderAggregate.complete()` makes completion idempotent for already completed orders. Cancelled orders are terminal and cannot become completed.
 
+Terminal-state violations should use specific exceptions:
+
+- `CannotCompleteCancelledOrderException`
+- `CannotCancelCompletedOrderException`
+
 ## Event Read Flow
 
 ```text

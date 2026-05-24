@@ -109,7 +109,9 @@ public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate> implem
     }
 
     public OrderAggregate cancel() {
-        Preconditions.checkState(status != OrderStatus.COMPLETED, "The order is already completed");
+        if (status == OrderStatus.COMPLETED) {
+            throw new CannotCancelCompletedOrderException(id);
+        }
 
         this.status = OrderStatus.CANCELLED;
 
@@ -129,8 +131,8 @@ public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate> implem
             return this;
         }
 
-        if (status != OrderStatus.PLACED) {
-            throw new OrderStateTransitionException(id, status, OrderStatus.COMPLETED);
+        if (status == OrderStatus.CANCELLED) {
+            throw new CannotCompleteCancelledOrderException(id);
         }
 
         this.status = OrderStatus.COMPLETED;

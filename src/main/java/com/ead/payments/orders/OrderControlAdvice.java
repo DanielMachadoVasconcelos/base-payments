@@ -43,10 +43,13 @@ public class OrderControlAdvice {
                 .body(problemDetail);
     }
 
-    @ExceptionHandler(OrderStateTransitionException.class)
-    public ResponseEntity<ProblemDetail> handleOrderStateTransitionException(OrderStateTransitionException ex) {
+    @ExceptionHandler({
+            CannotCancelCompletedOrderException.class,
+            CannotCompleteCancelledOrderException.class
+    })
+    public ResponseEntity<ProblemDetail> handleTerminalOrderStateException(RuntimeException ex) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.CONFLICT);
-        problemDetail.setTitle("Invalid Order State Transition");
+        problemDetail.setTitle("Terminal Order State");
         problemDetail.setDetail(ex.getMessage());
         problemDetail.setType(URI.create("v1/orders"));
         return ResponseEntity

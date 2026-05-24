@@ -254,6 +254,45 @@ public class OrderCancelledEvent {
 
 Events should be immutable and serializable.
 
+## Exception Good/Bad
+
+Prefer specific domain exceptions for meaningful business failures. Do not hide important state rules behind generic transition names.
+
+Good:
+
+```java
+public class CannotCompleteCancelledOrderException extends RuntimeException {
+
+    public CannotCompleteCancelledOrderException(UUID orderId) {
+        super("The cancelled order with id " + orderId + " cannot be completed");
+    }
+}
+```
+
+Good:
+
+```java
+public class CannotCancelCompletedOrderException extends RuntimeException {
+
+    public CannotCancelCompletedOrderException(UUID orderId) {
+        super("The completed order with id " + orderId + " cannot be cancelled");
+    }
+}
+```
+
+Bad:
+
+```java
+public class OrderStateTransitionException extends RuntimeException {
+
+    public OrderStateTransitionException(UUID orderId, OrderStatus from, OrderStatus to) {
+        super("Invalid state transition");
+    }
+}
+```
+
+The bad version is technically reusable, but it hides the business language. In this project, prefer exceptions that name the rule the user violated.
+
 ## Test Good/Bad
 
 Good:
@@ -285,6 +324,7 @@ The bad name does not match `should.*When.*` and has no display name.
 - Aggregate owns invariants and events.
 - External calls use gateway/client boundaries.
 - Cross-module communication uses events first.
+- Business-rule failures use specific exceptions named after the violated rule.
 - DTOs and tests use `snake_case`.
 - Tests follow `should...When...` and `@DisplayName`.
 - Feature work that will ship should update `CHANGELOG.md`.
