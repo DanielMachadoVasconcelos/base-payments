@@ -27,6 +27,7 @@ Application version: `0.0.1-SNAPSHOT`
 - Documented the project preference for specific business-rule exceptions.
 - Moved terminal-state exceptions into their vertical-slice packages and renamed them with noun-phrase class names.
 - Moved repeated order-placement setup into JUnit `@BeforeEach` fixtures where appropriate.
+- Added BDD story comments to the new cancel and complete order tests.
 
 ### Verification
 - Passed: `./gradlew testClasses`

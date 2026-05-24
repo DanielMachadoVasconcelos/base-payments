@@ -128,6 +128,35 @@ void rejectsNegativeAmount() {
 
 The bad example fails the architecture convention.
 
+## BDD Story Comments
+
+Controller/integration tests should read as a small business story. Use `// given`, `// when`, `// then`, and `// and` comments where they clarify the domain context being proven.
+
+Good:
+
+```java
+// given: the order has already reached the cancelled terminal state
+cancelOrder(orderId);
+
+// when: the customer tries to complete the cancelled order
+var response = completeOrder(orderId);
+
+// then: the domain rejects the invalid terminal-state transition
+response.andExpect(status().isConflict());
+```
+
+Bad:
+
+```java
+// call endpoint
+var response = completeOrder(orderId);
+
+// assert status
+response.andExpect(status().isConflict());
+```
+
+The comments should explain business context, not repeat the Java syntax.
+
 ## JSON Assertions
 
 JSON uses `snake_case`.
@@ -170,6 +199,7 @@ Checklist:
 - Extend `SpringBootIntegrationTest` unless a narrower slice test is enough.
 - Put shared fixture creation in `@BeforeEach` when every test in that scope needs it.
 - Use a `@Nested` test class when only a subset of scenarios shares expensive setup.
+- Add BDD comments that describe the business story under test.
 - Autowire `MockMvc`.
 - Autowire the Jackson `ObjectMapper`.
 - Add `@WithMockUser` or explicit HTTP Basic auth.

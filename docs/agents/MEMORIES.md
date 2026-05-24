@@ -17,6 +17,7 @@ Do not use this as a substitute for reading the repo. Use it as a compass.
 - The user strongly prefers meaningful, specific domain exceptions over generic reusable exceptions for business-rule failures.
 - The user prefers class names that start with domain nouns/adjectives instead of verbs or command-like phrasing.
 - The user prefers common test fixtures to live in JUnit/Spring setup methods instead of being repeated in every test method.
+- The user expects integration tests to include BDD story comments using Given/When/Then/And language focused on business context.
 
 ## Project Intent
 
@@ -83,3 +84,9 @@ YYYY-MM-DD - Agent note:
 - Why it matters: Tests read as behavior checks instead of setup scripts.
 - Verification: See `CHANGELOG.md` for the current verification status.
 - Follow-up: Use nested test scopes when only part of a class needs the fixture.
+
+2026-05-24 - BDD comments in integration tests:
+- What changed: Added Given/When/Then/And story comments to the new cancel and complete order tests.
+- Why it matters: Tests now explain the business behavior being proven, not only the HTTP mechanics.
+- Verification: See `CHANGELOG.md` for the current verification status.
+- Follow-up: Keep BDD comments focused on business context.
