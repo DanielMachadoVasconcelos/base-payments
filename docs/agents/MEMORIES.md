@@ -19,6 +19,8 @@ Do not use this as a substitute for reading the repo. Use it as a compass.
 - The user prefers scope-local test fixtures to live in JUnit/Spring setup methods instead of being repeated in every test method.
 - The user dislikes inheritance as a fixture-sharing mechanism; prefer injected operation providers for reusable business setup in tests.
 - The user expects integration tests to include BDD story comments using Given/When/Then/And language focused on business context.
+- The user wants upgrade summaries and change lists to be understandable to non-technical readers.
+- The user has a strict test architecture; do not create or modify tests unless explicitly requested, and then follow the existing test design exactly.
 
 ## Project Intent
 
@@ -30,8 +32,9 @@ Do not use this as a substitute for reading the repo. Use it as a compass.
 ## Stable Technical Memories
 
 - Java version is 25, from `build.gradle`.
-- Spring Boot version is 4.0.6, from `build.gradle`.
-- Spring Modulith version is 2.0.6, from `build.gradle`.
+- Spring Boot version is 4.1.0, from `build.gradle`.
+- Spring Modulith version is 2.1.0, from `build.gradle`.
+- Spring Cloud version is 2025.1.2, from `build.gradle`.
 - Local infrastructure lives in `compose.yaml`.
 - CI infrastructure lives in `docker-ci.yml`.
 - CI workflow lives in `.github/workflows/workflow.yml`.
@@ -43,7 +46,7 @@ Do not use this as a substitute for reading the repo. Use it as a compass.
 
 ## Current Gotchas
 
-- Older documentation used to conflict with Gradle by mentioning Java 24 and Spring Boot 3.x. The new agent docs should now point back to Java 25 and Spring Boot 4.0.6.
+- Older documentation used to conflict with Gradle by mentioning Java 24 and Spring Boot 3.x/4.0.x. The agent docs should now point back to Java 25 and Spring Boot 4.1.0.
 - The worktree may include a user-driven Jackson package move from `json` to `configurations`. Do not revert it.
 - `EventsController` currently has hardcoded fallback event responses when stored events are missing. Treat this as a known rough edge.
 - The worktree may contain generated/local artifacts such as `.gradle-user-home/`, `BOOT-INF/`, `META-INF/`, `.DS_Store`, and `terraform/`.
@@ -97,3 +100,9 @@ YYYY-MM-DD - Agent note:
 - Why it matters: Tests reuse meaningful business operations without growing inheritance.
 - Verification: See `CHANGELOG.md` for the current verification status.
 - Follow-up: Create new providers for reusable business states instead of adding static helpers or base-class methods.
+
+2026-07-11 - Spring Boot 4.1 platform upgrade:
+- What changed: Upgraded to Spring Boot 4.1.0, Spring Modulith 2.1.0, and Spring Cloud 2025.1.2; adopted Boot-managed issuer HTTP interfaces, native API-version routing, and async context propagation.
+- Why it matters: The project now uses the supported 4.1 platform and demonstrates the modern client/versioning capabilities expected of this case study.
+- Verification: Production and existing test-source compilation plus the existing architecture and logging tests passed. Full integration tests still require Docker.
+- Follow-up: Preserve `version` as the public header, keep V2 as the default, and avoid test changes unless the user explicitly requests them.

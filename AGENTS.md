@@ -30,7 +30,7 @@ Use the repository, not memory, as the authority:
 - Main code: `src/main/java/com/ead/payments`
 - Integration test base: `src/test/java/com/ead/payments/SpringBootIntegrationTest.java`
 
-As of this guide, the project uses Java 25, Spring Boot 4.0.6, Spring Modulith 2.0.6, PostgreSQL, Kafka, Flyway, MockMvc, WireMock, ArchUnit, and JaCoCo.
+As of this guide, the project uses Java 25, Spring Boot 4.1.0, Spring Modulith 2.1.0, Spring Cloud 2025.1.2, PostgreSQL, Kafka, Flyway, MockMvc, WireMock, ArchUnit, and JaCoCo.
 
 ## Non-Negotiable Agent Rules
 
@@ -141,7 +141,7 @@ Do not inject another feature's repository or aggregate. Use events first. If sy
 
 ## Candid Gotchas
 
-- Older docs may mention Java 24 or Spring Boot 3.x. Trust `build.gradle`: Java 25 and Spring Boot 4.0.6.
+- Older docs may mention Java 24 or Spring Boot 3.x/4.0.x. Trust `build.gradle`: Java 25 and Spring Boot 4.1.0.
 - `EventsController` currently has hardcoded fallback event responses when no event is found. Treat that as a known rough edge.
 - The README previously had stale ports and endpoint shapes. The current docs are intended to fix that.
 - Some comments in source files are explanatory for the case-study style. Keep comments useful, not noisy.

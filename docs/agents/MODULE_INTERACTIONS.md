@@ -41,6 +41,7 @@ sequenceDiagram
 Key decisions:
 
 - Issuer authorization happens before order persistence.
+- Spring Boot registers `IssuerClient` as a grouped HTTP interface client; the gateway does not build transport infrastructure.
 - `OrderAggregate` owns order invariants and event registration.
 - Spring Modulith handles event publication after persistence.
 - Inventory reacts through events, not direct order repository access.

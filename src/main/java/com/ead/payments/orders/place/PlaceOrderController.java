@@ -35,7 +35,7 @@ public class PlaceOrderController {
      * V1 endpoint: Explicit version header required.
      * Method overloading allows same method name with different parameter types.
      */
-    @PostMapping(headers = "version=1.0.0")
+    @PostMapping(version = "1.0.0")
     @ResponseStatus(HttpStatus.CREATED)
     @Observed(
         name = "http.orders.create",
@@ -58,7 +58,7 @@ public class PlaceOrderController {
      * Spring will route requests without version header to this method.
      * Method overloading with different parameter type (PlaceOrderRequestV2).
      */
-    @PostMapping
+    @PostMapping(version = "2.0.0")
     @ResponseStatus(HttpStatus.CREATED)
     @Observed(
         name = "http.orders.create",

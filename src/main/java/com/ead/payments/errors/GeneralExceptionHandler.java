@@ -36,15 +36,15 @@ class GeneralExceptionHandler {
 				})
 				.toList();
 
-		ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
+		ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_CONTENT);
 		problemDetail.setTitle("Constraint violated exception");
 		problemDetail.setDetail(exception.getMessage());
 		problemDetail.setProperty("invalid_params", invalidParams);
 
-		return ResponseEntity.unprocessableEntity().body(problemDetail);
+		return ResponseEntity.unprocessableContent().body(problemDetail);
 	}
 
-	@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+	@ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ProblemDetail>  handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
 
@@ -62,11 +62,11 @@ class GeneralExceptionHandler {
 
 		var details = "The '" + invalidClassName + "' is invalid";
 
-		ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
+		ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_CONTENT);
 		problemDetail.setTitle("Constraint Violation Exception");
 		problemDetail.setDetail(details);
 		problemDetail.setProperty("invalid_params", invalidParams);
 
-		return ResponseEntity.unprocessableEntity().body(problemDetail);
+		return ResponseEntity.unprocessableContent().body(problemDetail);
 	}
 }

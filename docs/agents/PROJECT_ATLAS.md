@@ -28,9 +28,9 @@ Current build facts:
 
 - Java 25 toolchain.
 - `--enable-preview` for Java compilation and tests.
-- Spring Boot 4.0.6.
-- Spring Modulith 2.0.6.
-- Spring Cloud 2025.1.1.
+- Spring Boot 4.1.0.
+- Spring Modulith 2.1.0.
+- Spring Cloud 2025.1.2.
 - Flyway 12.6.2.
 
 ## Package Map
@@ -58,7 +58,6 @@ src/main/java/com/ead/payments
   products
   purchases
   security
-  tracing
 ```
 
 Business modules:
@@ -78,7 +77,7 @@ Cross-cutting modules:
 - `logging`: correlation id, principal logging, request traffic, order id context, mocked-stub logging, OpenTelemetry appender configuration.
 - `security`: HTTP Basic, role setup for local/test, method security.
 - `observability`: HTTP observation filter configuration.
-- `auditing`, `tracing`, `confidentiality`, `errors`, `configurations`: supporting infrastructure and edge behavior.
+- `auditing`, `confidentiality`, `errors`, `configurations`: supporting infrastructure and edge behavior.
 
 ## Runtime Services
 
@@ -110,19 +109,15 @@ CI uses `docker-ci.yml`, which only starts PostgreSQL and Kafka.
 Current controllers expose:
 
 - `POST /orders` with `version: 1.0.0` for V1 orders; returns order `version` and lifecycle `status`.
-- `POST /orders` without a version header for V2 line-item orders; returns order `version` and lifecycle `status`.
-- `GET /orders/{order_id}` with `version: 1.0.0`; returns the order lifecycle `status`.
-- `POST /orders/{order_id}/cancel` with `version: 1.0.0`.
-- `PUT /orders/{order_id}/complete` with `version: 1.0.0`.
-- `GET /orders/{order_id}/events` with `version: 1.0.0`.
-- `GET /orders/{order_id}/events/{event_id}` with `version: 1.0.0`.
-- `POST /products` with `version: 1.0.0`.
+- `POST /orders` with `version: 2.0.0`, or without a version header, for V2 line-item orders; returns order `version` and lifecycle `status`.
+- `GET /orders/{order_id}`, cancel, complete, event-read, and product-create contracts are compatible from `1.0.0` onward. They accept either supported version, and no header selects `2.0.0`.
+- Versions other than `1.0.0` and `2.0.0` are rejected with `400 Bad Request` before a controller runs.
 
 JSON is `snake_case`.
 
 ## Candid Current Gotchas
 
-- Older docs used to mention Java 24 and Spring Boot 3.x. `build.gradle` says Java 25 and Spring Boot 4.0.6.
+- Older docs used to mention Java 24 and Spring Boot 3.x/4.0.x. `build.gradle` says Java 25 and Spring Boot 4.1.0.
 - The worktree may include a user package move from `com.ead.payments.json` to `com.ead.payments.configurations`. Do not revert it.
 - `EventsController` has a hardcoded fallback response when stored events are missing. That is useful to know before treating event reads as fully production-shaped.
 - Some generated/local directories may be present in the worktree. Ignore unrelated artifacts unless the task explicitly targets them.

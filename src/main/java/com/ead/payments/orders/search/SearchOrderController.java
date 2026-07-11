@@ -25,7 +25,7 @@ public class SearchOrderController {
     SearchOrderService searchOrderService;
     SearchOrderResponseMapper responseMapper;
 
-    @GetMapping(path = "/{order_id}", headers = "version=1.0.0")
+    @GetMapping(path = "/{order_id}", version = "1.0.0+")
     @ResponseStatus(HttpStatus.OK)
     public Optional<SearchOrderResponse> searchOrder(@PathVariable("order_id") @NotNull UUID orderId) {
         try (OrderIdLoggingContext.Scope ignored = OrderIdLoggingContext.withOrderId(orderId)) {

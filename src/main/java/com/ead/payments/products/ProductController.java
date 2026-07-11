@@ -22,7 +22,7 @@ public class ProductController {
 
     ProductService productService;
 
-    @PostMapping(headers = "version=1.0.0")
+    @PostMapping(version = "1.0.0+")
     @ResponseStatus(HttpStatus.CREATED)
     public CreateProductResponse createProduct(@RequestBody @Valid @NotNull  CreateProductRequest request) {
         var productId = UUID.randomUUID();
