@@ -10,8 +10,7 @@ import java.util.List;
 
 public record PlaceOrderRequestV2(
     @NotNull Currency currency,
-    @NotNull @Size(min = 1, max = 100) @Valid List<LineItemRequest> lineItems,
+    @NotNull @Size(min = 1, max = 100) List<@Valid LineItemRequest> lineItems,
     @Min(0L) Long amount  // Optional: for validation if provided
 ) {
 }
-

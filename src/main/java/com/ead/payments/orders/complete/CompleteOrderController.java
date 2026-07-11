@@ -24,7 +24,7 @@ public class CompleteOrderController {
     CompleteOrderService completeOrderService;
 
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping(path = "/{order_id}/complete", headers = "version=1.0.0")
+    @PutMapping(path = "/{order_id}/complete", version = "1.0.0+")
     public CompleteOrderResponse completeOrder(@PathVariable("order_id") @NotNull UUID orderId) {
         try (OrderIdLoggingContext.Scope ignored = OrderIdLoggingContext.withOrderId(orderId)) {
             var order = completeOrderService.handle(orderId)

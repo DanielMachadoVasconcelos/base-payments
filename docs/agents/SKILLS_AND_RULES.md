@@ -102,7 +102,7 @@ class RefundOrderController {
     private final RefundOrderService service;
     private final RefundOrderCommandMapper mapper;
 
-    @PostMapping(path = "/{order_id}/refund", headers = "version=1.0.0")
+    @PostMapping(path = "/{order_id}/refund", version = "1.0.0+")
     RefundOrderResponse refund(@PathVariable("order_id") UUID orderId,
                                @RequestBody @Valid RefundOrderRequest request) {
         var command = mapper.toCommand(orderId, request);
@@ -214,6 +214,8 @@ interface IssuerClient {
     IssuerAuthorizationResponse authorize(@RequestBody IssuerAuthorizationRequest request);
 }
 ```
+
+Register HTTP interfaces through a named Spring Boot service-client group and keep dynamic header customization in a `RestClientHttpServiceGroupConfigurer`. Do not manually assemble the adapter and proxy factory when Boot can own that infrastructure.
 
 Bad:
 
@@ -337,5 +339,6 @@ The bad name does not match `should.*When.*` and has no display name.
 - Reusable business setup belongs in injected test providers, not static helpers or inherited base-class methods.
 - Integration tests should use BDD story comments that explain business context.
 - DTOs and tests use `snake_case`.
+- Versioned controllers use the native mapping `version` attribute and the centrally configured supported-version list.
 - Tests follow `should...When...` and `@DisplayName`.
 - Feature work that will ship should update `CHANGELOG.md`.

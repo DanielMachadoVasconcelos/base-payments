@@ -17,7 +17,7 @@ import static com.ead.payments.mocks.WireMockProvider.IssuerServiceMockProvider;
 @EnableWireMock({
         @ConfigureWireMock(
                 name = "issuer-service",
-                baseUrlProperties = "issuer.client.base-url",
+                baseUrlProperties = "spring.http.serviceclient.issuer.base-url",
                 registerSpringBean = true
         )
 })

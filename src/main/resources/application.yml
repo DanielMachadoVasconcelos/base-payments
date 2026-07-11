@@ -4,7 +4,7 @@
 # Plain-English guide:
 # - "spring" contains the application and infrastructure settings.
 # - "management" controls health checks, metrics, traces, and logs.
-# - "issuer" points to the mock external payment issuer used locally.
+# - "spring.http.serviceclient.issuer" configures the mock external issuer.
 # - "eureka" configures service discovery for environments that use it.
 # -----------------------------------------------------------------------------
 
@@ -13,6 +13,28 @@ spring:
     # The internal name of this service.
     # Spring uses it in logs, service registration, and OpenTelemetry traces.
     name: base-payments
+
+  mvc:
+    apiversion:
+      # Keep the existing "version" request header, but let Spring parse and
+      # validate semantic versions instead of comparing raw header strings.
+      default: 2.0.0
+      supported:
+        - 1.0.0
+        - 2.0.0
+      detect-supported: false
+      use:
+        header: version
+
+  http:
+    serviceclient:
+      issuer:
+        # Spring Boot creates the IssuerClient proxy and applies these shared
+        # connection settings to every call in the issuer client group.
+        base-url: http://localhost:18081
+        connect-timeout: 2s
+        read-timeout: 5s
+        redirects: dont-follow
 
   devtools:
     # Extra conveniences for local development, such as better restart behavior.
@@ -52,7 +74,6 @@ spring:
     init:
       # Tells Spring which database flavor it is working with when SQL resources run.
       platform: postgresql
-      schema: orders
 
   flyway:
     # Flyway keeps the database structure aligned with the codebase.
@@ -93,16 +114,10 @@ spring:
       # Local startup should not fail just because a topic has not been created yet.
       missing-topics-fatal: false
 
-  security:
-    # Keeps the Spring Security filter chain active.
-    # This project expects authentication and authorization behavior to be enabled.
-    enabled: true
-
   jpa:
     # Hibernate / JPA controls how Java objects map to database tables.
     # SQL logging is disabled here to keep local logs readable.
     show-sql: false
-    format-sql: false
 
     properties:
       # Default schema used by Hibernate and Envers auditing tables.
@@ -119,6 +134,12 @@ spring:
       # In simple terms, this lets the app handle blocking work more efficiently.
       enabled: true
 
+  task:
+    execution:
+      # Spring Boot 4.1 can carry tracing and logging context into @Async work
+      # without a custom task decorator bean.
+      propagate-context: true
+
   docker:
     compose:
       # Spring can detect and start Docker Compose services for local development.
@@ -127,24 +148,10 @@ spring:
 
   modulith:
     # Spring Modulith manages domain events inside the application.
-    # If an event could not be fully delivered before shutdown, these options help
-    # retry and recover it on the next startup.
-    republish-outstanding-events: true
-
     events:
+      # If an event could not be fully delivered before shutdown, retry it on
+      # the next startup. The event tables themselves are managed by Flyway.
       republish-outstanding-events-on-restart: true
-
-      jdbc:
-        # Store Modulith events in the database so they survive restarts.
-        schema-initialization-enabled: true
-        schema: orders
-        table: events
-
-        # Snapshot settings reduce the amount of event history that must be replayed.
-        snapshot-table: snapshots
-        snapshot-schema: orders
-        snapshot-events: 1000
-        snapshot-interval: 1000
 
 springdoc:
   swagger-ui:
@@ -250,12 +257,6 @@ management:
           # correlated with traces and metrics in Grafana.
           endpoint: http://localhost:4318/v1/logs
           transport: HTTP
-
-issuer:
-  client:
-    # Local URL for the mock payment issuer used during development and tests.
-    # In this project, the service calls this endpoint when authorizing a payment.
-    base-url: http://localhost:18081
 
 eureka:
   client:

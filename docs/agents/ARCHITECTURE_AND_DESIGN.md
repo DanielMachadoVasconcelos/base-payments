@@ -67,7 +67,7 @@ class CancelOrderController {
 
     private final CancelOrderService service;
 
-    @PostMapping(path = "/{order_id}/cancel", headers = "version=1.0.0")
+    @PostMapping(path = "/{order_id}/cancel", version = "1.0.0+")
     CancelOrderResponse cancelOrder(@PathVariable("order_id") UUID orderId) {
         var order = service.handle(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
@@ -164,13 +164,15 @@ PlaceOrderService -> IssuerService -> IssuerGateway -> IssuerClient -> WireMock/
 
 Keep external response parsing out of `PlaceOrderController` and out of `OrderAggregate`.
 
+`IssuerClient` is a Spring HTTP interface registered in the `issuer` service group. Spring Boot creates the proxy and applies the base URL, timeouts, redirects, message conversion, and observation support. `IssuerClientConfiguration` should contain only group-specific customization such as forwarding correlation and test-selector headers; do not rebuild `RestClientAdapter` and `HttpServiceProxyFactory` by hand.
+
 ## Cross-Cutting Boundaries
 
 Use infrastructure packages for non-functional behavior:
 
 - Correlation and principal logging: `logging`.
 - Authorization and users: `security`.
-- HTTP observations and telemetry: `observability`, `tracing`, `logging`.
+- HTTP observations and telemetry: `observability`, `logging`, and `application.yml`.
 - Error mapping: `errors` and feature-specific `Advice` classes.
 - JSON configuration: `configurations`.
 
@@ -181,11 +183,15 @@ Business code may add purposeful domain metrics, but it should not carry request
 The place-order endpoint supports:
 
 - V1: `POST /orders` with `version: 1.0.0` and amount-based request/response.
-- V2: `POST /orders` with no version header and line-item request/response.
+- V2: `POST /orders` with `version: 2.0.0`, or no version header, and line-item request/response.
+
+Spring MVC owns version parsing and validation. The `version` header is the resolver, `2.0.0` is the default, and only `1.0.0` and `2.0.0` are supported. Exact mappings such as `version = "2.0.0"` select one contract. Baseline mappings such as `version = "1.0.0+"` mean an unchanged V1 contract remains usable by supported later clients.
 
 When adding or changing versions:
 
 - Keep request and response DTOs explicit.
 - Prefer names like `PlaceOrderRequestV2` and `PlaceOrderResponseV2`.
+- Use the native mapping `version` attribute, not a raw `headers = "version=..."` predicate.
+- Add the version to `spring.mvc.apiversion.supported` before exposing it.
 - Keep JSON examples in `snake_case`.
 - Add tests for routing behavior and response shape.

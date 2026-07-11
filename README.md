@@ -15,7 +15,7 @@ The project demonstrates:
 - Reliable event publication through Spring Modulith and Kafka.
 - PostgreSQL persistence with Flyway migrations.
 - HTTP APIs secured with Spring Security.
-- External issuer authorization behind a gateway/client boundary.
+- External issuer authorization behind a gateway and Boot-managed HTTP interface client.
 - Local observability with metrics, traces, logs, and Grafana dashboards.
 - Architecture tests that make naming, packaging, annotations, and test style executable rules.
 
@@ -24,8 +24,9 @@ AI agents should start with [AGENTS.md](AGENTS.md) before changing anything.
 ## Tech Stack
 
 - Java 25 with preview features enabled.
-- Spring Boot 4.0.6.
-- Spring Modulith 2.0.6.
+- Spring Boot 4.1.0.
+- Spring Modulith 2.1.0.
+- Spring Cloud 2025.1.2.
 - Gradle wrapper.
 - PostgreSQL, Kafka, WireMock, Grafana LGTM, pgAdmin, AKHQ.
 - Flyway, Spring Data JPA, Spring Security, Spring MVC, MapStruct, Lombok.
@@ -125,16 +126,18 @@ Security is enabled. In local and integration-test profiles, these users exist:
 
 Current controller surface:
 
+Spring parses the existing `version` header as a semantic API version. Versions `1.0.0` and `2.0.0` are supported; unsupported versions are rejected with `400 Bad Request`. Omitting the header selects `2.0.0`. Endpoints whose contract did not change are marked as compatible from V1 onward, so both supported versions can use them.
+
 | Method | Path | Version behavior | Role intent |
 | --- | --- | --- | --- |
 | `POST` | `/orders` | Header `version: 1.0.0` creates a V1 order and returns `version`/`status` | `CUSTOMER` or `MERCHANT` |
-| `POST` | `/orders` | No version header defaults to V2 with line items and returns `version`/`status` | `CUSTOMER` or `MERCHANT` |
-| `GET` | `/orders/{order_id}` | Header `version: 1.0.0`; includes lifecycle `status` | `CUSTOMER` or `MERCHANT` |
-| `POST` | `/orders/{order_id}/cancel` | Header `version: 1.0.0` | `CUSTOMER` or `MERCHANT` |
-| `PUT` | `/orders/{order_id}/complete` | Header `version: 1.0.0`; idempotent for already completed orders | `CUSTOMER` or `MERCHANT` |
-| `GET` | `/orders/{order_id}/events` | Header `version: 1.0.0` | `CUSTOMER` or `MERCHANT` |
-| `GET` | `/orders/{order_id}/events/{event_id}` | Header `version: 1.0.0` | `CUSTOMER` or `MERCHANT` |
-| `POST` | `/products` | Header `version: 1.0.0` | `ADMIN` |
+| `POST` | `/orders` | Header `version: 2.0.0`, or no version header, creates a V2 line-item order | `CUSTOMER` or `MERCHANT` |
+| `GET` | `/orders/{order_id}` | V1-compatible; accepts `1.0.0`, `2.0.0`, or the default | `CUSTOMER` or `MERCHANT` |
+| `POST` | `/orders/{order_id}/cancel` | V1-compatible; accepts `1.0.0`, `2.0.0`, or the default | `CUSTOMER` or `MERCHANT` |
+| `PUT` | `/orders/{order_id}/complete` | V1-compatible and idempotent for already completed orders | `CUSTOMER` or `MERCHANT` |
+| `GET` | `/orders/{order_id}/events` | V1-compatible; accepts `1.0.0`, `2.0.0`, or the default | `CUSTOMER` or `MERCHANT` |
+| `GET` | `/orders/{order_id}/events/{event_id}` | V1-compatible; accepts `1.0.0`, `2.0.0`, or the default | `CUSTOMER` or `MERCHANT` |
+| `POST` | `/products` | V1-compatible; accepts `1.0.0`, `2.0.0`, or the default | `ADMIN` |
 
 Example V2 order request:
 
@@ -191,7 +194,6 @@ com.ead.payments
   security
   observability
   auditing
-  tracing
 ```
 
 Core rules:
@@ -201,6 +203,7 @@ Core rules:
 - Aggregates enforce invariants and publish domain events.
 - Repositories persist aggregate roots.
 - External systems sit behind gateways and clients.
+- Spring Boot registers grouped HTTP interface clients and supplies their connection settings.
 - Cross-module communication should prefer Spring Modulith events.
 - Cross-cutting concerns belong in configuration, filters, interceptors, and advice.
 

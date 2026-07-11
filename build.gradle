@@ -3,7 +3,7 @@ plugins {
 	id 'idea'
 	id 'jacoco'
 
-	id 'org.springframework.boot' version '4.0.6'
+	id 'org.springframework.boot' version '4.1.0'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -28,16 +28,15 @@ configurations {
 
 repositories {
 	mavenCentral()
-	maven { url 'https://repo.spring.io/milestone' }
-	maven { url 'https://repo.spring.io/snapshot' }
-	maven { url 'https://repo.spring.io/release' }
+	maven { url = uri('https://repo.spring.io/milestone') }
+	maven { url = uri('https://repo.spring.io/snapshot') }
+	maven { url = uri('https://repo.spring.io/release') }
 }
 
 ext {
-	set('springModulithVersion', "2.0.6")
-	set('springCloudVersion', "2025.1.1")
+	set('springModulithVersion', "2.1.0")
+	set('springCloudVersion', "2025.1.2")
 	set('flyway.version', "12.6.2")
-	set('opentelemetry.version', "1.62.0")
 }
 
 dependencies {
@@ -45,6 +44,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	implementation 'org.springframework.boot:spring-boot-starter-restclient'
 	// Spring Boot 4 still uses the AspectJ starter to activate @Observed weaving.
 	implementation 'org.springframework.boot:spring-boot-starter-aspectj'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'

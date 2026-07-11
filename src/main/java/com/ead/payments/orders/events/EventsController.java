@@ -30,7 +30,7 @@ public class EventsController {
      * @param orderId the ID of the order
      * @return a list of events for the order
      */
-    @GetMapping(path = "/{order_id}/events", headers = "version=1.0.0")
+    @GetMapping(path = "/{order_id}/events", version = "1.0.0+")
     @ResponseStatus(HttpStatus.OK)
     public List<OrderEventResponse> getOrderEvents(@PathVariable("order_id") @NotNull UUID orderId) {
         try (OrderIdLoggingContext.Scope ignored = OrderIdLoggingContext.withOrderId(orderId)) {
@@ -63,7 +63,7 @@ public class EventsController {
      * @param eventId the ID of the event
      * @return the event, or empty if not found
      */
-    @GetMapping(path = "/{order_id}/events/{event_id}", headers = "version=1.0.0")
+    @GetMapping(path = "/{order_id}/events/{event_id}", version = "1.0.0+")
     @ResponseStatus(HttpStatus.OK)
     public Optional<OrderEventResponse> getOrderEvent(
             @PathVariable("order_id") @NotNull UUID orderId,

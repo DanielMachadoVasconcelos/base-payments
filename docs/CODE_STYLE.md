@@ -16,8 +16,8 @@ Do not use older guidance that mentions Java 24 or Spring Boot 3.x for this repo
 Current facts from `build.gradle`:
 
 - Java 25.
-- Spring Boot 4.0.6.
-- Spring Modulith 2.0.6.
+- Spring Boot 4.1.0.
+- Spring Modulith 2.1.0.
 
 ## Short Rule Set
 

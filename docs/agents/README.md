@@ -28,7 +28,7 @@ Start at the root [AGENTS.md](../../AGENTS.md), then use this map to choose the 
 ## Fast Facts
 
 - Java: 25 with preview features.
-- Spring Boot: 4.0.6.
+- Spring Boot: 4.1.0.
 - Main package: `com.ead.payments`.
 - Local infrastructure: `compose.yaml`.
 - CI infrastructure: `docker-ci.yml` plus `.github/workflows/workflow.yml`.

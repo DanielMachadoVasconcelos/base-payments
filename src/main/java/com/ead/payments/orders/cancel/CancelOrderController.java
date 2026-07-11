@@ -24,7 +24,7 @@ public class CancelOrderController {
     CancelOrderService cancelOrderService;
 
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping(path = "/{order_id}/cancel", headers = "version=1.0.0")
+    @PostMapping(path = "/{order_id}/cancel", version = "1.0.0+")
     public Optional<CancelOrderResponse> cancelOrder(@PathVariable( "order_id") @NotNull UUID orderId) {
         try (OrderIdLoggingContext.Scope ignored = OrderIdLoggingContext.withOrderId(orderId)) {
             return cancelOrderService.handle(orderId)
