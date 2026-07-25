@@ -120,10 +120,24 @@ EventsController
   -> OrderEventService
     -> OrderEventRepository
       -> event publication table
-  -> OrderEventResponse
+  -> persisted OrderEventResponse, empty collection, or event-specific 404
 ```
 
-Candid note: `EventsController` currently returns hardcoded fallback event responses if the service returns no stored event. Treat this as a rough edge and avoid copying the pattern into new production-shaped endpoints.
+Event reads query persisted publications by the serialized event's order id. The collection endpoint returns an empty list when no publications match; the event-specific endpoint returns `404` when the requested publication does not exist for that order.
+
+## Order Listing Flow
+
+```text
+OrderListingController
+  -> validates page, size, status, and ISO-8601 creation bounds
+  -> OrderListingService
+    -> rejects inverted creation periods
+    -> builds only the requested JPA specifications
+    -> OrderRepository returns a deterministic page
+  -> OrderListingResponse with content and page metadata
+```
+
+Listing is read-only. State changes remain explicit domain actions such as cancel and complete; the API does not expose generic update or physical-delete operations for financial orders.
 
 ## Module Contract Table
 
@@ -133,6 +147,7 @@ Candid note: `EventsController` currently returns hardcoded fallback event respo
 | `orders.place` | Place-order use case, issuer gateway/client | `OrderRepository`, `IssuerGateway` | Order aggregate events through save |
 | `orders.cancel` | Cancel-order use case | `OrderRepository` | `OrderCancelledEvent` through aggregate |
 | `orders.complete` | Complete-order use case | `OrderRepository` | `OrderCompletedEvent` through aggregate |
+| `orders.list` | Paginated order browsing and filters | `OrderRepository` | None |
 | `orders.search` | Order lookup | `OrderRepository` | None |
 | `orders.events` | Event read API | Modulith/event publication persistence | None |
 | `products` | Product aggregate and create-product use case | `ProductRepository` | `ProductCreatedEvent` |

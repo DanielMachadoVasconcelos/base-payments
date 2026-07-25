@@ -16,10 +16,12 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.data.domain.Persistable;
+import org.hibernate.annotations.BatchSize;
 import org.springframework.security.authorization.method.AuthorizeReturnObject;
 
 import java.util.ArrayList;
 import java.util.Currency;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,6 +45,9 @@ public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate> implem
     @Version
     private Long version;
 
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private Instant createdAt;
+
     @Column
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
@@ -55,6 +60,7 @@ public class OrderAggregate extends AbstractAggregateRoot<OrderAggregate> implem
     private Long amount;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 100)
     private List<OrderLineItemEntity> lineItems = new ArrayList<>();
 
     public OrderAggregate(PlaceOrderCommand command) {

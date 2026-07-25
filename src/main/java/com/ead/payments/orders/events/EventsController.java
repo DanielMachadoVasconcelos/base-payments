@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -36,22 +35,8 @@ public class EventsController {
         try (OrderIdLoggingContext.Scope ignored = OrderIdLoggingContext.withOrderId(orderId)) {
             log.info("Retrieving events for order: {}", orderId);
 
-            // Try to get events from the service
             List<OrderEventResponse> events = orderEventService.findAllByOrderId(orderId);
             log.info("Found {} events from service", events.size());
-
-            // If no events found, return a hardcoded response for testing
-            if (events.isEmpty()) {
-                log.info("Returning hardcoded event for testing");
-                UUID eventId = UUID.randomUUID();
-                return List.of(new OrderEventResponse(
-                        eventId,
-                        java.time.Instant.now(),
-                        "OrderPlacedEvent",
-                        "{\"orderId\":\"" + orderId + "\",\"status\":\"PLACED\"}"
-                ));
-            }
-
             return events;
         }
     }
@@ -61,31 +46,18 @@ public class EventsController {
      *
      * @param orderId the ID of the order
      * @param eventId the ID of the event
-     * @return the event, or empty if not found
+     * @return the event
      */
     @GetMapping(path = "/{order_id}/events/{event_id}", version = "1.0.0+")
     @ResponseStatus(HttpStatus.OK)
-    public Optional<OrderEventResponse> getOrderEvent(
+    public OrderEventResponse getOrderEvent(
             @PathVariable("order_id") @NotNull UUID orderId,
             @PathVariable("event_id") @NotNull UUID eventId) {
         try (OrderIdLoggingContext.Scope ignored = OrderIdLoggingContext.withOrderId(orderId)) {
             log.info("Retrieving event {} for order: {}", eventId, orderId);
 
-            // Try to get the event from the service
-            Optional<OrderEventResponse> event = orderEventService.findByOrderIdAndEventId(orderId, eventId);
-
-            // If no event found, return a hardcoded response for testing
-            if (event.isEmpty()) {
-                log.info("Returning hardcoded event for testing");
-                return Optional.of(new OrderEventResponse(
-                        eventId,
-                        java.time.Instant.now(),
-                        "OrderPlacedEvent",
-                        "{\"orderId\":\"" + orderId + "\",\"status\":\"PLACED\"}"
-                ));
-            }
-
-            return event;
+            return orderEventService.findByOrderIdAndEventId(orderId, eventId)
+                    .orElseThrow(() -> new OrderEventNotFoundException(orderId, eventId));
         }
     }
 }

@@ -15,9 +15,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Currency;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -118,5 +120,36 @@ class EventsControllerTest extends SpringBootIntegrationTest {
                 .andExpect(jsonPath("$.id", is(eventId)))
                 .andExpect(jsonPath("$.event_type", is(notNullValue())))
                 .andExpect(jsonPath("$.event_data", is(notNullValue())));
+    }
+
+    @Test
+    @WithMockUser(username = "customer", roles = "CUSTOMER")
+    @DisplayName("Should return an empty history when an order has no stored events")
+    void shouldReturnAnEmptyHistoryWhenAnOrderHasNoStoredEvents() throws Exception {
+        // given: an order identifier with no stored event publications
+        var orderId = UUID.randomUUID();
+
+        // when: the customer reads that order history
+        var response = mockMvc.perform(get("/orders/" + orderId + "/events"));
+
+        // then: the API returns the truthful empty collection
+        response.andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    @WithMockUser(username = "customer", roles = "CUSTOMER")
+    @DisplayName("Should report a missing event when it is absent from an order history")
+    void shouldReportAMissingEventWhenItIsAbsentFromAnOrderHistory() throws Exception {
+        // given: identifiers with no matching stored event publication
+        var orderId = UUID.randomUUID();
+        var eventId = UUID.randomUUID();
+
+        // when: the customer requests that specific event
+        var response = mockMvc.perform(get("/orders/" + orderId + "/events/" + eventId));
+
+        // then: the API reports that the event does not exist
+        response.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.title", is("Order Event Not Found")));
     }
 }

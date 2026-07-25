@@ -16,20 +16,17 @@ import java.util.UUID;
 public interface OrderEventRepository extends JpaRepository<OrderEvent, UUID> {
 
     /**
-     * Find all events.
-     *
-     * @return a list of all events
-     */
-    @Query(value = "SELECT * FROM orders.event_publication", nativeQuery = true)
-    List<OrderEvent> findAllEvents();
-
-    /**
      * Find all events for an order.
      *
      * @param orderId the ID of the order
      * @return a list of events for the order
      */
-    @Query(value = "SELECT * FROM orders.event_publication WHERE serialized_event LIKE CONCAT('%', :orderId, '%')", nativeQuery = true)
+    @Query(value = """
+            SELECT *
+            FROM orders.event_publication
+            WHERE serialized_event::jsonb ->> 'id' = :orderId
+            ORDER BY publication_date ASC, id ASC
+            """, nativeQuery = true)
     List<OrderEvent> findByOrderId(@Param("orderId") String orderId);
 
     /**
@@ -39,6 +36,11 @@ public interface OrderEventRepository extends JpaRepository<OrderEvent, UUID> {
      * @param eventId the ID of the event
      * @return the event, or empty if not found
      */
-    @Query(value = "SELECT * FROM orders.event_publication WHERE serialized_event LIKE CONCAT('%', :orderId, '%') AND id = :eventId", nativeQuery = true)
+    @Query(value = """
+            SELECT *
+            FROM orders.event_publication
+            WHERE serialized_event::jsonb ->> 'id' = :orderId
+              AND id = :eventId
+            """, nativeQuery = true)
     Optional<OrderEvent> findByOrderIdAndEventId(@Param("orderId") String orderId, @Param("eventId") UUID eventId);
 }

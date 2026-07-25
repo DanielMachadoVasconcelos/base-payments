@@ -66,6 +66,7 @@ Business modules:
 - `orders.place`: place-order HTTP flow, request versions, issuer authorization, command and response mapping.
 - `orders.cancel`: cancel-order use case.
 - `orders.complete`: complete-order use case with idempotent completion semantics.
+- `orders.list`: paginated order browsing with lifecycle and creation-period filters.
 - `orders.search`: search-order use case.
 - `orders.events`: read access over stored order events.
 - `products`: product aggregate and create-product use case.
@@ -110,7 +111,7 @@ Current controllers expose:
 
 - `POST /orders` with `version: 1.0.0` for V1 orders; returns order `version` and lifecycle `status`.
 - `POST /orders` with `version: 2.0.0`, or without a version header, for V2 line-item orders; returns order `version` and lifecycle `status`.
-- `GET /orders/{order_id}`, cancel, complete, event-read, and product-create contracts are compatible from `1.0.0` onward. They accept either supported version, and no header selects `2.0.0`.
+- `GET /orders`, `GET /orders/{order_id}`, cancel, complete, event-read, and product-create contracts are compatible from `1.0.0` onward. They accept either supported version, and no header selects `2.0.0`.
 - Versions other than `1.0.0` and `2.0.0` are rejected with `400 Bad Request` before a controller runs.
 
 JSON is `snake_case`.
@@ -119,5 +120,5 @@ JSON is `snake_case`.
 
 - Older docs used to mention Java 24 and Spring Boot 3.x/4.0.x. `build.gradle` says Java 25 and Spring Boot 4.1.0.
 - The worktree may include a user package move from `com.ead.payments.json` to `com.ead.payments.configurations`. Do not revert it.
-- `EventsController` has a hardcoded fallback response when stored events are missing. That is useful to know before treating event reads as fully production-shaped.
+- Order event reads are backed only by persisted Modulith publications; the API does not fabricate fallback events.
 - Some generated/local directories may be present in the worktree. Ignore unrelated artifacts unless the task explicitly targets them.
