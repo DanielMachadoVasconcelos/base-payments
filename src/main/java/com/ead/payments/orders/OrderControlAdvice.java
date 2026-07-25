@@ -2,6 +2,8 @@ package com.ead.payments.orders;
 
 import com.ead.payments.orders.cancel.CompletedOrderCancellationException;
 import com.ead.payments.orders.complete.CancelledOrderCompletionException;
+import com.ead.payments.orders.events.OrderEventNotFoundException;
+import com.ead.payments.orders.list.InvalidOrderListingPeriodException;
 import java.net.URI;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -42,6 +44,30 @@ public class OrderControlAdvice {
         problemDetail.setType(URI.create("v1/orders"));
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
+                .body(problemDetail);
+    }
+
+    @ExceptionHandler(OrderEventNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handleOrderEventNotFoundException(OrderEventNotFoundException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        problemDetail.setTitle("Order Event Not Found");
+        problemDetail.setDetail(ex.getMessage());
+        problemDetail.setType(URI.create("v1/orders/events"));
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(problemDetail);
+    }
+
+    @ExceptionHandler(InvalidOrderListingPeriodException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidOrderListingPeriodException(
+            InvalidOrderListingPeriodException ex
+    ) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problemDetail.setTitle("Invalid Order Listing Period");
+        problemDetail.setDetail(ex.getMessage());
+        problemDetail.setType(URI.create("v1/orders"));
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(problemDetail);
     }
 

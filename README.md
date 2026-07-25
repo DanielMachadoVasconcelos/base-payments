@@ -132,6 +132,7 @@ Spring parses the existing `version` header as a semantic API version. Versions 
 | --- | --- | --- | --- |
 | `POST` | `/orders` | Header `version: 1.0.0` creates a V1 order and returns `version`/`status` | `CUSTOMER` or `MERCHANT` |
 | `POST` | `/orders` | Header `version: 2.0.0`, or no version header, creates a V2 line-item order | `CUSTOMER` or `MERCHANT` |
+| `GET` | `/orders` | V1-compatible paginated listing; filters by `status`, `created_from`, and `created_to` | `CUSTOMER` or `MERCHANT` |
 | `GET` | `/orders/{order_id}` | V1-compatible; accepts `1.0.0`, `2.0.0`, or the default | `CUSTOMER` or `MERCHANT` |
 | `POST` | `/orders/{order_id}/cancel` | V1-compatible; accepts `1.0.0`, `2.0.0`, or the default | `CUSTOMER` or `MERCHANT` |
 | `PUT` | `/orders/{order_id}/complete` | V1-compatible and idempotent for already completed orders | `CUSTOMER` or `MERCHANT` |
@@ -174,6 +175,20 @@ curl --request POST 'http://localhost:8080/orders' \
 ```
 
 JSON uses `snake_case` globally.
+
+Example order listing request:
+
+```bash
+curl --get 'http://localhost:8080/orders' \
+  --user merchant:password \
+  --data-urlencode 'status=PLACED' \
+  --data-urlencode 'created_from=2026-07-01T00:00:00Z' \
+  --data-urlencode 'created_to=2026-07-31T23:59:59Z' \
+  --data-urlencode 'page=0' \
+  --data-urlencode 'size=20'
+```
+
+The collection is ordered by newest creation time and then by order id. `page` starts at `0`, and `size` accepts values from `1` through `100`. An inverted creation period returns `400 Bad Request`. Event history endpoints return only persisted event publications: an empty history is `200 []`, while a missing specific event is `404 Not Found`.
 
 ## Architecture At A Glance
 

@@ -18,12 +18,15 @@ Each shipped entry should include:
 Application version: `0.0.1-SNAPSHOT`
 
 ### Added
+- Added `GET /orders` with deterministic pagination and optional lifecycle and creation-period filters.
 - Added idempotent order completion with `PUT /orders/{order_id}/complete`.
 - Added `OrderCompletedEvent` for first-time `PLACED -> COMPLETED` transitions.
 - Added specific terminal-state exceptions for completing cancelled orders and cancelling completed orders.
 - Added semantic API-version validation for the existing `version` header, with V2 as the default and unsupported versions rejected early.
 
 ### Changed
+- Made order event-history reads return only persisted publications, with truthful empty collections and event-specific `404` responses.
+- Added creation timestamps to order-listing responses and batched line-item loading for paginated reads.
 - Upgraded Spring Boot from 4.0.6 to 4.1.0, Spring Modulith from 2.0.6 to 2.1.0, and Spring Cloud from 2025.1.1 to 2025.1.2.
 - Replaced the manually assembled issuer HTTP proxy with Spring Boot's named service-client group, including managed timeouts, redirects, JSON conversion, and correlation-header forwarding.
 - Made unchanged V1 HTTP contracts compatible with supported V2/default requests through baseline version mappings.

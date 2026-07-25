@@ -48,7 +48,7 @@ Do not use this as a substitute for reading the repo. Use it as a compass.
 
 - Older documentation used to conflict with Gradle by mentioning Java 24 and Spring Boot 3.x/4.0.x. The agent docs should now point back to Java 25 and Spring Boot 4.1.0.
 - The worktree may include a user-driven Jackson package move from `json` to `configurations`. Do not revert it.
-- `EventsController` currently has hardcoded fallback event responses when stored events are missing. Treat this as a known rough edge.
+- Event-history endpoints return only persisted publications. Empty histories are truthful empty collections, and missing specific events return `404`.
 - The worktree may contain generated/local artifacts such as `.gradle-user-home/`, `BOOT-INF/`, `META-INF/`, `.DS_Store`, and `terraform/`.
 
 ## Handoff Notes Template
@@ -106,3 +106,9 @@ YYYY-MM-DD - Agent note:
 - Why it matters: The project now uses the supported 4.1 platform and demonstrates the modern client/versioning capabilities expected of this case study.
 - Verification: Production and existing test-source compilation plus the existing architecture and logging tests passed. Full integration tests still require Docker.
 - Follow-up: Preserve `version` as the public header, keep V2 as the default, and avoid test changes unless the user explicitly requests them.
+
+2026-07-22 - Read-only order management expansion:
+- What changed: Added paginated order listing with status and creation-period filters, and removed fabricated event-history fallbacks.
+- Why it matters: Financial order history remains auditable, while operators can browse orders without introducing generic mutation or physical deletion.
+- Verification: Production/test compilation, focused integration tests, and architecture tests were run in the feature worktree.
+- Follow-up: Keep future order state changes as explicit domain actions rather than generic `PUT`, `PATCH`, or `DELETE` operations.
